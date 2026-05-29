@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+.DS_Store
+
+# local planning note, not part of the project
+tam-kapsamli-prompt-guven-katmani (1).md

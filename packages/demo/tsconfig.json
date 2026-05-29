@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "composite": true,
+    "noEmit": false
+  },
+  "references": [{ "path": "../core" }, { "path": "../sd-jwt" }],
+  "include": ["src"]
+}
