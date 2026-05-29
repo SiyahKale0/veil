@@ -2,6 +2,7 @@ import {
   asString,
   type Credential,
   MAX_PAYLOAD_BYTES,
+  type NonceStore,
   type Presentation,
   parseJsonObject,
   VerificationError,
@@ -113,7 +114,10 @@ export class ZkAgeProver {
 export class ZkAgeVerifier {
   private readonly publicKey: InstanceType<typeof lib.BBSPublicKey>;
 
-  constructor(issuerPublicKey: string) {
+  constructor(
+    issuerPublicKey: string,
+    private readonly nonceStore?: NonceStore,
+  ) {
     this.publicKey = new lib.BBSPublicKey(fromB64(issuerPublicKey));
   }
 
@@ -132,6 +136,10 @@ export class ZkAgeVerifier {
     await ensureReady();
     const raw = parseJsonObject(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
     const proofB64 = asString(raw.proof, 'presentation.proof');
+
+    if (this.nonceStore && !(await this.nonceStore.consume(context.nonce))) {
+      throw new VerificationError('nonce is stale, unknown, or already used');
+    }
 
     const statements = new lib.Statements();
     const sigStatement = statements.add(

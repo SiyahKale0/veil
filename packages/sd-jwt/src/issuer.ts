@@ -6,6 +6,15 @@ import type { Credential } from '@veil/core';
 import type { Jwk } from './keys.js';
 import { DISCLOSABLE_CLAIMS, MEMBERSHIP_VCT, type MembershipClaims } from './membership.js';
 
+/** Default credential lifetime: one year. */
+const DEFAULT_VALIDITY_SECONDS = 365 * 24 * 60 * 60;
+
+/** Options for a single issuance. */
+export interface IssueOptions {
+  /** Seconds until the credential expires (`exp`). Defaults to one year. */
+  expiresInSeconds?: number;
+}
+
 /** Signs membership credentials bound to a holder's key. */
 export class SdJwtIssuer {
   private readonly sdjwt: Promise<SDJwtVcInstance>;
@@ -31,11 +40,17 @@ export class SdJwtIssuer {
    * the credential is bound to `holderPublicKey` via the `cnf` confirmation
    * claim so only that holder can present it.
    */
-  async issue(claims: MembershipClaims, holderPublicKey: Jwk): Promise<Credential> {
+  async issue(
+    claims: MembershipClaims,
+    holderPublicKey: Jwk,
+    options: IssueOptions = {},
+  ): Promise<Credential> {
     const sdjwt = await this.sdjwt;
+    const issuedAt = Math.floor(Date.now() / 1000);
     const payload: SdJwtVcPayload = {
       iss: this.issuerId,
-      iat: Math.floor(Date.now() / 1000),
+      iat: issuedAt,
+      exp: issuedAt + (options.expiresInSeconds ?? DEFAULT_VALIDITY_SECONDS),
       vct: MEMBERSHIP_VCT,
       cnf: { jwk: holderPublicKey },
       ...claims,

@@ -5,6 +5,7 @@ import {
   assertWithinSize,
   type DisclosedClaims,
   MAX_PAYLOAD_BYTES,
+  type NonceStore,
   type Presentation,
   type PresentationRequest,
   VerificationError,
@@ -22,7 +23,10 @@ import type { Jwk } from './keys.js';
 export class SdJwtVerifier implements Verifier {
   private readonly sdjwt: Promise<SDJwtVcInstance>;
 
-  constructor(issuerPublicKey: Jwk) {
+  constructor(
+    issuerPublicKey: Jwk,
+    private readonly nonceStore?: NonceStore,
+  ) {
     this.sdjwt = (async () => {
       const verifier = await ES256.getVerifier(issuerPublicKey);
       const kbVerifier: KbVerifier = async (data, sig, payload) => {
@@ -48,6 +52,10 @@ export class SdJwtVerifier implements Verifier {
     }
     assertWithinSize(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
 
+    if (this.nonceStore && !(await this.nonceStore.consume(request.nonce))) {
+      throw new VerificationError('nonce is stale, unknown, or already used');
+    }
+
     const sdjwt = await this.sdjwt;
     const result = await sdjwt
       .verify(presentation.payload, {
@@ -63,6 +71,11 @@ export class SdJwtVerifier implements Verifier {
     }
     if (result.kb.payload.aud !== request.audience) {
       throw new VerificationError('key-binding audience does not match the request');
+    }
+
+    const { exp } = result.payload as { exp?: number };
+    if (typeof exp === 'number' && exp < Math.floor(Date.now() / 1000)) {
+      throw new VerificationError('credential has expired');
     }
 
     return result.payload as DisclosedClaims;

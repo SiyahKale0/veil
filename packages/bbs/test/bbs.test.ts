@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { MalformedInputError, type PresentationRequest, VerificationError } from '@veil/core';
+import {
+  InMemoryNonceStore,
+  MalformedInputError,
+  type PresentationRequest,
+  VerificationError,
+} from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '../src/index.js';
 
@@ -118,6 +123,23 @@ describe('BBS selective disclosure', () => {
     const presentation = await presenter.present(req, credential);
 
     await expect(verifier.verify(presentation, req)).rejects.toThrow(VerificationError);
+  });
+
+  it('rejects an unknown or replayed nonce when a nonce store is used', async () => {
+    const store = new InMemoryNonceStore();
+    const presenter = new BbsPresenter();
+    const verifier = new BbsVerifier(issuer.publicKey, store);
+    const credential = await issuer.issue(CLAIMS);
+
+    const good = request({ nonce: await store.issue() });
+    await expect(verifier.verify(await presenter.present(good, credential), good)).resolves.toEqual(
+      {
+        category_sports: 'climbing',
+      },
+    );
+    await expect(verifier.verify(await presenter.present(good, credential), good)).rejects.toThrow(
+      VerificationError,
+    );
   });
 
   it('rejects a malformed presentation payload before touching crypto', async () => {

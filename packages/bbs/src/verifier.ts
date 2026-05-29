@@ -3,6 +3,7 @@ import {
   asStringRecord,
   type DisclosedClaims,
   MAX_PAYLOAD_BYTES,
+  type NonceStore,
   type Presentation,
   type PresentationRequest,
   parseJsonObject,
@@ -19,7 +20,10 @@ import { FIELDS } from './membership.js';
 export class BbsVerifier implements Verifier {
   private readonly publicKey: InstanceType<typeof lib.BBSPublicKey>;
 
-  constructor(issuerPublicKey: string) {
+  constructor(
+    issuerPublicKey: string,
+    private readonly nonceStore?: NonceStore,
+  ) {
     this.publicKey = new lib.BBSPublicKey(fromB64(issuerPublicKey));
   }
 
@@ -49,6 +53,10 @@ export class BbsVerifier implements Verifier {
       if (!(claim in revealed)) {
         throw new VerificationError(`requested claim was not disclosed: ${claim}`);
       }
+    }
+
+    if (this.nonceStore && !(await this.nonceStore.consume(request.nonce))) {
+      throw new VerificationError('nonce is stale, unknown, or already used');
     }
 
     let verified = false;

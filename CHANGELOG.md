@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — hardening toward production
+
+- Tooling: Biome lint and format, a GitHub Actions CI workflow, exact-pinned
+  dependencies, per-package builds with declarations, and zero audit advisories.
+- Trust boundaries: a typed error hierarchy with generic messages, and
+  size- and shape-validation of untrusted presentations and vault blobs before
+  any crypto runs. KDF parameters read from a blob are bounded so a crafted blob
+  cannot exhaust memory during unlock.
+- Freshness and lifecycle: single-use, time-limited nonces (`InMemoryNonceStore`)
+  can be wired into any verifier to reject unknown, expired or replayed nonces;
+  SD-JWT credentials now carry and enforce an expiry.
+
 ## 0.5.0
 
 Zero-knowledge age predicate.

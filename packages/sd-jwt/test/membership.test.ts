@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { InMemoryStore, type PresentationRequest, VerificationError } from '@veil/core';
+import {
+  InMemoryNonceStore,
+  InMemoryStore,
+  type PresentationRequest,
+  VerificationError,
+} from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   generateKeyPair,
@@ -138,6 +143,41 @@ describe('SD-JWT membership credential', () => {
     const verifier = new SdJwtVerifier(wrongKeys.publicKey);
 
     const credential = await issuer.issue(CLAIMS, holderKeys.publicKey);
+    const req = request();
+    const presentation = await presenter.present(req, credential);
+
+    await expect(verifier.verify(presentation, req)).rejects.toThrow(VerificationError);
+  });
+
+  it('rejects an unknown or replayed nonce when a nonce store is used', async () => {
+    const store = new InMemoryNonceStore();
+    const issuer = new SdJwtIssuer(ISSUER_ID, issuerKeys.privateKey);
+    const presenter = new SdJwtPresenter(holderKeys.privateKey);
+    const verifier = new SdJwtVerifier(issuerKeys.publicKey, store);
+    const credential = await issuer.issue(CLAIMS, holderKeys.publicKey);
+
+    // A nonce the store never issued is rejected.
+    const unknown = request();
+    await expect(
+      verifier.verify(await presenter.present(unknown, credential), unknown),
+    ).rejects.toThrow(VerificationError);
+
+    // An issued nonce works once, then a replay with the same nonce is rejected.
+    const good = request({ nonce: await store.issue() });
+    await expect(
+      verifier.verify(await presenter.present(good, credential), good),
+    ).resolves.toBeDefined();
+    await expect(verifier.verify(await presenter.present(good, credential), good)).rejects.toThrow(
+      VerificationError,
+    );
+  });
+
+  it('rejects an expired credential', async () => {
+    const issuer = new SdJwtIssuer(ISSUER_ID, issuerKeys.privateKey);
+    const presenter = new SdJwtPresenter(holderKeys.privateKey);
+    const verifier = new SdJwtVerifier(issuerKeys.publicKey);
+
+    const credential = await issuer.issue(CLAIMS, holderKeys.publicKey, { expiresInSeconds: -10 });
     const req = request();
     const presentation = await presenter.present(req, credential);
 
