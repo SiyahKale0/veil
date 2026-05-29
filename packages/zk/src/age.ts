@@ -1,4 +1,11 @@
-import { type Credential, type Presentation, VerificationError } from '@veil/core';
+import {
+  asString,
+  type Credential,
+  MAX_PAYLOAD_BYTES,
+  type Presentation,
+  parseJsonObject,
+  VerificationError,
+} from '@veil/core';
 import {
   AGE_INDEX,
   encodeMessages,
@@ -123,8 +130,8 @@ export class ZkAgeVerifier {
       throw new VerificationError(`unsupported presentation format: ${presentation.format}`);
     }
     await ensureReady();
-    const parsed = JSON.parse(presentation.payload) as { proof: string };
-    const proof = new lib.CompositeProof(fromB64(parsed.proof));
+    const raw = parseJsonObject(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
+    const proofB64 = asString(raw.proof, 'presentation.proof');
 
     const statements = new lib.Statements();
     const sigStatement = statements.add(
@@ -142,9 +149,15 @@ export class ZkAgeVerifier {
     const metaStatements = ageEqualityMetaStatements(sigStatement, boundStatement);
     const proofSpec = new lib.ProofSpec(statements, metaStatements, [], utf8(context.audience));
 
-    const result = proof.verify(proofSpec, utf8(context.nonce));
-    if (!result.verified) {
-      throw new VerificationError(`predicate proof rejected: ${result.error ?? 'invalid proof'}`);
+    let verified = false;
+    try {
+      const proof = new lib.CompositeProof(fromB64(proofB64));
+      verified = proof.verify(proofSpec, utf8(context.nonce)).verified;
+    } catch {
+      throw new VerificationError('predicate proof rejected: malformed proof');
+    }
+    if (!verified) {
+      throw new VerificationError('predicate proof rejected: invalid proof');
     }
     return true;
   }

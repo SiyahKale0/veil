@@ -2,7 +2,9 @@ import { digest, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { KbVerifier } from '@sd-jwt/types';
 import {
+  assertWithinSize,
   type DisclosedClaims,
+  MAX_PAYLOAD_BYTES,
   type Presentation,
   type PresentationRequest,
   VerificationError,
@@ -44,6 +46,7 @@ export class SdJwtVerifier implements Verifier {
     if (presentation.format !== 'sd-jwt-vc') {
       throw new VerificationError(`unsupported presentation format: ${presentation.format}`);
     }
+    assertWithinSize(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
 
     const sdjwt = await this.sdjwt;
     const result = await sdjwt

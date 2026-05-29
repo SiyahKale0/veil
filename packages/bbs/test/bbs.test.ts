@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type PresentationRequest, VerificationError } from '@veil/core';
+import { MalformedInputError, type PresentationRequest, VerificationError } from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '../src/index.js';
 
@@ -118,5 +118,17 @@ describe('BBS selective disclosure', () => {
     const presentation = await presenter.present(req, credential);
 
     await expect(verifier.verify(presentation, req)).rejects.toThrow(VerificationError);
+  });
+
+  it('rejects a malformed presentation payload before touching crypto', async () => {
+    const verifier = new BbsVerifier(issuer.publicKey);
+    const req = request();
+
+    await expect(verifier.verify({ format: 'bbs', payload: 'not json' }, req)).rejects.toThrow(
+      MalformedInputError,
+    );
+    await expect(verifier.verify({ format: 'bbs', payload: '{}' }, req)).rejects.toThrow(
+      MalformedInputError,
+    );
   });
 });

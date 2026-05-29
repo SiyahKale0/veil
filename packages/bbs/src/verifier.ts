@@ -1,17 +1,16 @@
 import {
+  asString,
+  asStringRecord,
   type DisclosedClaims,
+  MAX_PAYLOAD_BYTES,
   type Presentation,
   type PresentationRequest,
+  parseJsonObject,
   VerificationError,
   type Verifier,
 } from '@veil/core';
 import { challenge, ensureReady, fromB64, getParams, lib, utf8 } from './internal.js';
 import { FIELDS } from './membership.js';
-
-interface BbsPresentationPayload {
-  proof: string;
-  revealed: Record<string, string>;
-}
 
 /**
  * Verifies BBS presentations against the issuer's public key, checking the proof
@@ -31,11 +30,14 @@ export class BbsVerifier implements Verifier {
 
     await ensureReady();
     const params = getParams();
-    const parsed = JSON.parse(presentation.payload) as BbsPresentationPayload;
-    const proof = new lib.BBSPoKSigProof(fromB64(parsed.proof));
+
+    // Validate the untrusted payload before touching any crypto.
+    const raw = parseJsonObject(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
+    const proofB64 = asString(raw.proof, 'presentation.proof');
+    const revealed = asStringRecord(raw.revealed, 'presentation.revealed');
 
     const revealedMsgs = new Map<number, Uint8Array>();
-    for (const [name, value] of Object.entries(parsed.revealed)) {
+    for (const [name, value] of Object.entries(revealed)) {
       const index = FIELDS.indexOf(name as (typeof FIELDS)[number]);
       if (index < 0) {
         throw new VerificationError(`unknown claim: ${name}`);
@@ -44,23 +46,30 @@ export class BbsVerifier implements Verifier {
     }
 
     for (const claim of request.requestedClaims) {
-      if (!(claim in parsed.revealed)) {
+      if (!(claim in revealed)) {
         throw new VerificationError(`requested claim was not disclosed: ${claim}`);
       }
     }
 
-    const contribution = proof.challengeContribution(params, true, revealedMsgs);
-    const result = proof.verify(
-      challenge(contribution, request),
-      this.publicKey,
-      params,
-      true,
-      revealedMsgs,
-    );
-    if (!result.verified) {
-      throw new VerificationError(`presentation rejected: ${result.error ?? 'invalid proof'}`);
+    let verified = false;
+    try {
+      const proof = new lib.BBSPoKSigProof(fromB64(proofB64));
+      const contribution = proof.challengeContribution(params, true, revealedMsgs);
+      const result = proof.verify(
+        challenge(contribution, request),
+        this.publicKey,
+        params,
+        true,
+        revealedMsgs,
+      );
+      verified = result.verified;
+    } catch {
+      throw new VerificationError('presentation rejected: malformed proof');
+    }
+    if (!verified) {
+      throw new VerificationError('presentation rejected: invalid proof');
     }
 
-    return { ...parsed.revealed };
+    return { ...revealed };
   }
 }

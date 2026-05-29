@@ -1,8 +1,26 @@
-import type { Credential, CredentialStore } from '@veil/core';
+import {
+  asIntInRange,
+  asObject,
+  asString,
+  type Credential,
+  type CredentialStore,
+  MAX_BLOB_BYTES,
+  parseJsonObject,
+  VeilError,
+} from '@veil/core';
 import { deriveKek, type KdfParams, open, randomKey, type SealedBytes, seal } from './crypto.js';
 
 const VAULT_VERSION = 1;
 const CHECK_TOKEN = 'veil-vault-check';
+
+// Bounds on KDF params read from an untrusted blob, so a crafted blob cannot
+// trigger an out-of-memory or runaway-CPU denial of service during unlock.
+const KDF_OPS_MIN = 1;
+const KDF_OPS_MAX = 10;
+const KDF_MEM_MIN = 8 * 1024; // 8 KiB
+const KDF_MEM_MAX = 256 * 1024 * 1024; // 256 MiB
+const KDF_ALG_MIN = 1; // argon2i13
+const KDF_ALG_MAX = 2; // argon2id13
 
 /** One stored credential: its DEK wrapped by the KEK, and its data under the DEK. */
 interface VaultEntry {
@@ -25,11 +43,46 @@ export interface VaultBlob {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export class WrongPasswordError extends Error {
+export class WrongPasswordError extends VeilError {
   constructor() {
     super('vault could not be unlocked: wrong password or corrupted blob');
-    this.name = 'WrongPasswordError';
   }
+}
+
+function asSealedBytes(value: unknown, field: string): SealedBytes {
+  const object = asObject(value, field);
+  return {
+    nonce: asString(object.nonce, `${field}.nonce`),
+    ciphertext: asString(object.ciphertext, `${field}.ciphertext`),
+  };
+}
+
+/** Validates and bounds an untrusted vault blob before any key derivation. */
+function validateBlob(blob: string): VaultBlob {
+  const raw = parseJsonObject(blob, MAX_BLOB_BYTES, 'vault blob');
+  asIntInRange(raw.v, VAULT_VERSION, VAULT_VERSION, 'vault blob version');
+
+  const kdfObject = asObject(raw.kdf, 'vault blob kdf');
+  const kdf: KdfParams = {
+    salt: asString(kdfObject.salt, 'vault blob kdf.salt'),
+    opsLimit: asIntInRange(kdfObject.opsLimit, KDF_OPS_MIN, KDF_OPS_MAX, 'vault blob kdf.opsLimit'),
+    memLimit: asIntInRange(kdfObject.memLimit, KDF_MEM_MIN, KDF_MEM_MAX, 'vault blob kdf.memLimit'),
+    alg: asIntInRange(kdfObject.alg, KDF_ALG_MIN, KDF_ALG_MAX, 'vault blob kdf.alg'),
+  };
+
+  const check = asSealedBytes(raw.check, 'vault blob check');
+
+  const entriesObject = asObject(raw.entries, 'vault blob entries');
+  const entries: Record<string, VaultEntry> = {};
+  for (const id of Object.keys(entriesObject)) {
+    const entry = asObject(entriesObject[id], `vault blob entry "${id}"`);
+    entries[id] = {
+      wrappedDek: asSealedBytes(entry.wrappedDek, `entry "${id}" wrappedDek`),
+      data: asSealedBytes(entry.data, `entry "${id}" data`),
+    };
+  }
+
+  return { v: VAULT_VERSION, kdf, check, entries };
 }
 
 /**
@@ -59,17 +112,20 @@ export class EncryptedVaultStore implements CredentialStore {
    * {@link WrongPasswordError} if the password does not match.
    */
   static async unlock(password: string, blob: string): Promise<EncryptedVaultStore> {
-    const parsed = JSON.parse(blob) as VaultBlob;
-    const { kek } = await deriveKek(password, parsed.kdf);
+    // Structure and bounds are validated first; a malformed blob throws
+    // MalformedInputError. A well-formed blob that the password cannot open (or
+    // that is corrupted) throws WrongPasswordError.
+    const parsed = validateBlob(blob);
     try {
+      const { kek } = await deriveKek(password, parsed.kdf);
       const token = decoder.decode(await open(kek, parsed.check));
       if (token !== CHECK_TOKEN) {
         throw new Error('check token mismatch');
       }
+      return new EncryptedVaultStore(kek, parsed.kdf, new Map(Object.entries(parsed.entries)));
     } catch {
       throw new WrongPasswordError();
     }
-    return new EncryptedVaultStore(kek, parsed.kdf, new Map(Object.entries(parsed.entries)));
   }
 
   async put(id: string, credential: Credential): Promise<void> {

@@ -64,14 +64,6 @@ export interface ConsentManager {
   request(request: PresentationRequest): Promise<ConsentDecision>;
 }
 
-/** Raised when the user declines a request; no data is presented. */
-export class ConsentDeniedError extends Error {
-  constructor(message = 'the user declined to share the requested data') {
-    super(message);
-    this.name = 'ConsentDeniedError';
-  }
-}
-
 /** Persists the holder's credentials. */
 export interface CredentialStore {
   put(id: string, credential: Credential): Promise<void>;
@@ -80,12 +72,16 @@ export interface CredentialStore {
   delete(id: string): Promise<void>;
 }
 
-/** Raised when a presentation fails verification. */
-export class VerificationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'VerificationError';
-  }
-}
-
+export { ConsentDeniedError, MalformedInputError, VeilError, VerificationError } from './errors.js';
 export { InMemoryStore } from './memory-store.js';
+export {
+  asIntInRange,
+  asObject,
+  asString,
+  asStringArray,
+  asStringRecord,
+  assertWithinSize,
+  MAX_BLOB_BYTES,
+  MAX_PAYLOAD_BYTES,
+  parseJsonObject,
+} from './validation.js';

@@ -1,4 +1,4 @@
-import type { Credential } from '@veil/core';
+import { type Credential, MalformedInputError } from '@veil/core';
 import { describe, expect, it } from 'vitest';
 import {
   EncryptedVaultStore,
@@ -77,5 +77,24 @@ describe('encrypted vault', () => {
 
     expect(blob.entries.a.data.ciphertext).not.toEqual(blob.entries.b.data.ciphertext);
     expect(blob.entries.a.wrappedDek.ciphertext).not.toEqual(blob.entries.b.wrappedDek.ciphertext);
+  });
+
+  it('rejects a malformed blob', async () => {
+    await expect(EncryptedVaultStore.unlock(PASSWORD, 'not json')).rejects.toThrow(
+      MalformedInputError,
+    );
+    await expect(EncryptedVaultStore.unlock(PASSWORD, '{}')).rejects.toThrow(MalformedInputError);
+  });
+
+  it('rejects a blob with abusive KDF parameters (DoS guard)', async () => {
+    const vault = await EncryptedVaultStore.create(PASSWORD);
+    await vault.put('membership', CRED);
+    const blob = JSON.parse(await vault.export()) as VaultBlob;
+
+    // A crafted memLimit that would exhaust memory during key derivation.
+    blob.kdf.memLimit = 64 * 1024 * 1024 * 1024;
+    await expect(EncryptedVaultStore.unlock(PASSWORD, JSON.stringify(blob))).rejects.toThrow(
+      MalformedInputError,
+    );
   });
 });

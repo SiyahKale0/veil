@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type Credential, VerificationError } from '@veil/core';
+import { type Credential, MalformedInputError, VerificationError } from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '../src/index.js';
 
@@ -84,5 +84,16 @@ describe('zero-knowledge age predicate', () => {
     await expect(verifier.verifyAgeAtLeast(presentation, 18, ctx)).rejects.toThrow(
       VerificationError,
     );
+  });
+
+  it('rejects a malformed proof payload', async () => {
+    const verifier = new ZkAgeVerifier(issuer.publicKey);
+
+    await expect(
+      verifier.verifyAgeAtLeast({ format: 'zk', payload: 'not json' }, 18, context()),
+    ).rejects.toThrow(MalformedInputError);
+    await expect(
+      verifier.verifyAgeAtLeast({ format: 'zk', payload: '{}' }, 18, context()),
+    ).rejects.toThrow(MalformedInputError);
   });
 });
