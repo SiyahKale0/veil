@@ -6,6 +6,7 @@
     { "path": "packages/vault" },
     { "path": "packages/consent" },
     { "path": "packages/bbs" },
+    { "path": "packages/zk" },
     { "path": "packages/demo" }
   ]
 }

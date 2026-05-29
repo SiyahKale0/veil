@@ -27,6 +27,7 @@ packages/
   vault     encrypted-at-rest credential store and zero-knowledge sync
   consent   consent step and the wallet that enforces scope-based disclosure
   bbs       BBS scheme: selective disclosure with unlinkable presentations
+  zk        zero-knowledge predicate proofs (e.g. age >= 18) over a BBS credential
   demo      end-to-end command-line walkthroughs
 ```
 
@@ -45,6 +46,15 @@ re-randomized proof on every presentation, so two presentations are unlinkable
 without issuing multiple credentials. Both schemes sit behind the same
 `Presenter` / `Verifier` contracts, so callers do not change.
 
+## Predicate proofs
+
+The `zk` package proves a statement about a claim without disclosing it — for
+example "age >= 18" over a privately held age. A composite proof binds a BBS
+proof-of-knowledge to a Bulletproofs++ range proof (transparent, no trusted
+setup) so the bound is checked against the signed age, and the verifier learns
+only true or false. The earlier phase also envisioned a browser WASM-SIMD
+benchmark; that needs a browser harness and is not part of this Node build.
+
 ## Try it
 
 ```bash
@@ -53,6 +63,7 @@ npm run demo           # issue -> present -> verify, start to finish
 npm run demo:vault     # encrypt, sync, restore on another device
 npm run demo:consent   # two apps, consent, scope-based disclosure, pairwise keys
 npm run demo:bbs       # one credential, two unlinkable presentations
+npm run demo:zk        # prove age >= 18 without revealing the age
 npm test               # unit + negative-path tests
 npm run typecheck
 ```

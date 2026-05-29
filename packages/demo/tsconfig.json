@@ -11,7 +11,8 @@
     { "path": "../sd-jwt" },
     { "path": "../vault" },
     { "path": "../consent" },
-    { "path": "../bbs" }
+    { "path": "../bbs" },
+    { "path": "../zk" }
   ],
   "include": ["src"]
 }

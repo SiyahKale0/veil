@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.5.0
+
+Zero-knowledge age predicate.
+
+- `@veil/zk` — `ZkAgeIssuer`, `ZkAgeProver` and `ZkAgeVerifier` prove a statement
+  like "age >= 18" without revealing the age. A composite proof ties a BBS
+  signature proof-of-knowledge to a Bulletproofs++ range proof through a
+  witness-equality constraint, so the bound is checked against the signed age.
+- Bulletproofs++ is transparent — no trusted setup. Proofs are bound to the
+  verifier's nonce and audience.
+- The verifier learns only true/false and chooses the threshold itself; the
+  proof cannot be stretched past the real age.
+- `npm run demo:zk` proves age >= 18 for a private age of 25 and prints timings
+  (~0.6 s prove, ~0.2 s verify here).
+- Tests cover the boundary, a threshold the age does not meet, wrong nonce /
+  audience / issuer key, and that the same age proves >= 21 but not >= 26.
+
+Scope note: the original phase also called for a browser WASM-SIMD
+before/after benchmark. That needs a browser harness and is out of scope for
+this Node/CLI build; only Node prove/verify timings are reported here.
+
 ## 0.4.0
 
 BBS selective disclosure with multi-presentation unlinkability.
