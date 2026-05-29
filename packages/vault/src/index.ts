@@ -1,3 +1,3 @@
-export { EncryptedVaultStore, WrongPasswordError, type VaultBlob } from './vault.js';
-export { InMemoryVaultSync } from './sync.js';
 export type { KdfParams } from './crypto.js';
+export { InMemoryVaultSync } from './sync.js';
+export { EncryptedVaultStore, type VaultBlob, WrongPasswordError } from './vault.js';

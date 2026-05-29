@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
 import type { Credential } from '@veil/core';
-import { EncryptedVaultStore, InMemoryVaultSync, WrongPasswordError, type VaultBlob } from '../src/index.js';
+import { describe, expect, it } from 'vitest';
+import {
+  EncryptedVaultStore,
+  InMemoryVaultSync,
+  type VaultBlob,
+  WrongPasswordError,
+} from '../src/index.js';
 
 const PASSWORD = 'correct horse battery staple';
 const SECRET = 'top-secret-credential-payload-7f3a';
@@ -49,7 +54,8 @@ describe('encrypted vault', () => {
     // Device B restores it with the same password.
     const blob = await sync.download('account-1');
     expect(blob).not.toBeNull();
-    const deviceB = await EncryptedVaultStore.unlock(PASSWORD, blob!);
+    if (!blob) return;
+    const deviceB = await EncryptedVaultStore.unlock(PASSWORD, blob);
     expect(await deviceB.get('membership')).toEqual(CRED);
   });
 

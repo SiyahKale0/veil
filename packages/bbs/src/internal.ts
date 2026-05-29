@@ -51,7 +51,10 @@ function concat(...parts: Uint8Array[]): Uint8Array {
  * The Fiat-Shamir challenge, bound to the verifier's nonce and audience so a
  * proof cannot be replayed or redirected to a different verifier.
  */
-export function challenge(challengeContribution: Uint8Array, request: PresentationRequest): Uint8Array {
+export function challenge(
+  challengeContribution: Uint8Array,
+  request: PresentationRequest,
+): Uint8Array {
   return lib.bytesToChallenge(
     concat(challengeContribution, utf8(request.nonce), utf8(request.audience)),
   );

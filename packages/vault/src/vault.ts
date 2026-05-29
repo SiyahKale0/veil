@@ -1,12 +1,5 @@
 import type { Credential, CredentialStore } from '@veil/core';
-import {
-  deriveKek,
-  open,
-  randomKey,
-  seal,
-  type KdfParams,
-  type SealedBytes,
-} from './crypto.js';
+import { deriveKek, type KdfParams, open, randomKey, type SealedBytes, seal } from './crypto.js';
 
 const VAULT_VERSION = 1;
 const CHECK_TOKEN = 'veil-vault-check';

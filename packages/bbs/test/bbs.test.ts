@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { type PresentationRequest, VerificationError } from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { VerificationError, type PresentationRequest } from '@veil/core';
 import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '../src/index.js';
 
 const CLAIMS: MembershipClaims = {

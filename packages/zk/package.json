@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@docknetwork/crypto-wasm-ts": "^0.67.0",
+    "@docknetwork/crypto-wasm-ts": "0.67.0",
     "@veil/core": "0.1.0"
   }
 }

@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
+import { InMemoryStore, type PresentationRequest, VerificationError } from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { InMemoryStore, VerificationError, type PresentationRequest } from '@veil/core';
 import {
-  SdJwtIssuer,
-  SdJwtPresenter,
-  SdJwtVerifier,
   generateKeyPair,
   type KeyPair,
   type MembershipClaims,
+  SdJwtIssuer,
+  SdJwtPresenter,
+  SdJwtVerifier,
 } from '../src/index.js';
 
 const ISSUER_ID = 'https://issuer.veil.dev';
@@ -64,9 +64,10 @@ describe('SD-JWT membership credential', () => {
 
     const held = await store.get('membership');
     expect(held).not.toBeNull();
+    if (!held) return;
 
     const req = request();
-    const presentation = await presenter.present(req, held!);
+    const presentation = await presenter.present(req, held);
     const disclosed = await verifier.verify(presentation, req);
     expect(disclosed.category_sports).toBe('climbing');
   });

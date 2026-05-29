@@ -1,2 +1,2 @@
-export { CallbackConsentManager, approveAll, approveOnly, denyAll } from './consent.js';
-export { Wallet, type ConsentLogEntry } from './wallet.js';
+export { approveAll, approveOnly, CallbackConsentManager, denyAll } from './consent.js';
+export { type ConsentLogEntry, Wallet } from './wallet.js';

@@ -1,11 +1,11 @@
-import { ES256, digest } from '@sd-jwt/crypto-nodejs';
+import { digest, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { KbVerifier } from '@sd-jwt/types';
 import {
-  VerificationError,
   type DisclosedClaims,
   type Presentation,
   type PresentationRequest,
+  VerificationError,
   type Verifier,
 } from '@veil/core';
 import type { Jwk } from './keys.js';
@@ -40,24 +40,20 @@ export class SdJwtVerifier implements Verifier {
     })();
   }
 
-  async verify(
-    presentation: Presentation,
-    request: PresentationRequest,
-  ): Promise<DisclosedClaims> {
+  async verify(presentation: Presentation, request: PresentationRequest): Promise<DisclosedClaims> {
     if (presentation.format !== 'sd-jwt-vc') {
       throw new VerificationError(`unsupported presentation format: ${presentation.format}`);
     }
 
     const sdjwt = await this.sdjwt;
-    let result;
-    try {
-      result = await sdjwt.verify(presentation.payload, {
+    const result = await sdjwt
+      .verify(presentation.payload, {
         requiredClaimKeys: request.requestedClaims,
         keyBindingNonce: request.nonce,
+      })
+      .catch((error: unknown) => {
+        throw new VerificationError(`presentation rejected: ${(error as Error).message}`);
       });
-    } catch (error) {
-      throw new VerificationError(`presentation rejected: ${(error as Error).message}`);
-    }
 
     if (!result.kb) {
       throw new VerificationError('presentation is missing the required key binding');

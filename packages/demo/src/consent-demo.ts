@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
+import { approveAll, approveOnly, denyAll, Wallet } from '@veil/consent';
 import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from '@veil/core';
-import { Wallet, approveAll, approveOnly, denyAll } from '@veil/consent';
 import {
+  generateKeyPair,
+  type MembershipClaims,
   PairwiseKeyManager,
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-  generateKeyPair,
-  type MembershipClaims,
 } from '@veil/sd-jwt';
 
 const CLAIMS: MembershipClaims = {

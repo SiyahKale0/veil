@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { type Credential, VerificationError } from '@veil/core';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { VerificationError, type Credential } from '@veil/core';
-import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier, type ProofContext } from '../src/index.js';
+import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '../src/index.js';
 
 let issuer: ZkAgeIssuer;
 const prover = new ZkAgeProver();
@@ -81,6 +81,8 @@ describe('zero-knowledge age predicate', () => {
     const ctx = context();
     const presentation = await prover.proveAgeAtLeast(await credential(30), 18, ctx);
 
-    await expect(verifier.verifyAgeAtLeast(presentation, 18, ctx)).rejects.toThrow(VerificationError);
+    await expect(verifier.verifyAgeAtLeast(presentation, 18, ctx)).rejects.toThrow(
+      VerificationError,
+    );
   });
 });

@@ -1,6 +1,6 @@
-import { ES256, digest, generateSalt } from '@sd-jwt/crypto-nodejs';
-import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
+import { digest, ES256, generateSalt } from '@sd-jwt/crypto-nodejs';
 import type { SdJwtVcPayload } from '@sd-jwt/sd-jwt-vc';
+import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { DisclosureFrame } from '@sd-jwt/types';
 import type { Credential } from '@veil/core';
 import type { Jwk } from './keys.js';

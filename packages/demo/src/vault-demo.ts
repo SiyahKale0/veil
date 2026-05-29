@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type { PresentationRequest } from '@veil/core';
 import {
+  generateKeyPair,
+  type MembershipClaims,
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-  generateKeyPair,
-  type MembershipClaims,
 } from '@veil/sd-jwt';
 import { EncryptedVaultStore, InMemoryVaultSync, WrongPasswordError } from '@veil/vault';
 

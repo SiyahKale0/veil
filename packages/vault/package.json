@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "@veil/core": "0.1.0",
-    "libsodium-wrappers-sumo": "^0.7.15"
+    "libsodium-wrappers-sumo": "0.7.16"
   }
 }

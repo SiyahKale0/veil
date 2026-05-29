@@ -1,4 +1,4 @@
-import { ES256, digest } from '@sd-jwt/crypto-nodejs';
+import { digest, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { PresentationFrame } from '@sd-jwt/types';
 import type { Credential, Presentation, PresentationRequest, Presenter } from '@veil/core';

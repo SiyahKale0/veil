@@ -1,11 +1,11 @@
-export { generateKeyPair } from './keys.js';
+export { SdJwtIssuer } from './issuer.js';
 export type { Jwk, KeyPair } from './keys.js';
+export { generateKeyPair } from './keys.js';
 export {
-  MEMBERSHIP_VCT,
   DISCLOSABLE_CLAIMS,
+  MEMBERSHIP_VCT,
   type MembershipClaims,
 } from './membership.js';
-export { SdJwtIssuer } from './issuer.js';
+export { PairwiseKeyManager } from './pairwise.js';
 export { SdJwtPresenter } from './presenter.js';
 export { SdJwtVerifier } from './verifier.js';
-export { PairwiseKeyManager } from './pairwise.js';

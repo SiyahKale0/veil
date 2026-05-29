@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier, type ProofContext } from '@veil/zk';
+import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '@veil/zk';
 
 function context(): ProofContext {
   return { nonce: randomUUID(), audience: 'https://bar.example' };
@@ -43,7 +43,9 @@ async function main(): Promise<void> {
   console.log(`   age >= 21 ? ${passes21}`);
   console.log(`   age >= 26 ? ${passes26}\n`);
 
-  console.log(`4. Timing on this machine: prove ~${proveMs.toFixed(0)} ms, verify ~${verifyMs.toFixed(0)} ms`);
+  console.log(
+    `4. Timing on this machine: prove ~${proveMs.toFixed(0)} ms, verify ~${verifyMs.toFixed(0)} ms`,
+  );
 }
 
 main().catch((error) => {

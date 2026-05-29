@@ -56,7 +56,9 @@ export async function deriveKek(
   const opsLimit = existing?.opsLimit ?? s.crypto_pwhash_OPSLIMIT_INTERACTIVE;
   const memLimit = existing?.memLimit ?? s.crypto_pwhash_MEMLIMIT_INTERACTIVE;
   const alg = existing?.alg ?? s.crypto_pwhash_ALG_ARGON2ID13;
-  const salt = existing ? fromBase64(s, existing.salt) : s.randombytes_buf(s.crypto_pwhash_SALTBYTES);
+  const salt = existing
+    ? fromBase64(s, existing.salt)
+    : s.randombytes_buf(s.crypto_pwhash_SALTBYTES);
   const kek = s.crypto_pwhash(KEY_BYTES, password, salt, opsLimit, memLimit, alg);
   return { kek, params: { salt: toBase64(s, salt), opsLimit, memLimit, alg } };
 }
@@ -71,7 +73,13 @@ export async function randomKey(): Promise<Uint8Array> {
 export async function seal(key: Uint8Array, plaintext: Uint8Array): Promise<SealedBytes> {
   const s = await getSodium();
   const nonce = s.randombytes_buf(s.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-  const ciphertext = s.crypto_aead_xchacha20poly1305_ietf_encrypt(plaintext, null, null, nonce, key);
+  const ciphertext = s.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    plaintext,
+    null,
+    null,
+    nonce,
+    key,
+  );
   return { nonce: toBase64(s, nonce), ciphertext: toBase64(s, ciphertext) };
 }
 

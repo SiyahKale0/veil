@@ -1,8 +1,8 @@
 import {
-  VerificationError,
   type DisclosedClaims,
   type Presentation,
   type PresentationRequest,
+  VerificationError,
   type Verifier,
 } from '@veil/core';
 import { challenge, ensureReady, fromB64, getParams, lib, utf8 } from './internal.js';

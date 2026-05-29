@@ -1,13 +1,13 @@
-import { VerificationError, type Credential, type Presentation } from '@veil/core';
+import { type Credential, type Presentation, VerificationError } from '@veil/core';
 import {
   AGE_INDEX,
-  MAX_AGE,
   encodeMessages,
   ensureReady,
   fromB64,
   getBppParams,
   getSigParams,
   lib,
+  MAX_AGE,
   toB64,
   utf8,
 } from './internal.js';
@@ -128,7 +128,12 @@ export class ZkAgeVerifier {
 
     const statements = new lib.Statements();
     const sigStatement = statements.add(
-      lib.Statement.bbsSignatureVerifierConstantTime(getSigParams(), this.publicKey, new Map(), false),
+      lib.Statement.bbsSignatureVerifierConstantTime(
+        getSigParams(),
+        this.publicKey,
+        new Map(),
+        false,
+      ),
     );
     const boundStatement = statements.add(
       lib.Statement.boundCheckBppFromCompressedParams(minAge, MAX_AGE, getBppParams()),

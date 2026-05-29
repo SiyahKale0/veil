@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
 import type { Credential, Presenter, Verifier } from '@veil/core';
-import { SdJwtIssuer, SdJwtPresenter, SdJwtVerifier, generateKeyPair } from '@veil/sd-jwt';
+import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from '@veil/sd-jwt';
+import { describe, expect, it } from 'vitest';
 import { BbsIssuer, BbsPresenter, BbsVerifier } from '../src/index.js';
 
 const CLAIMS = {

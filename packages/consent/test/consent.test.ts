@@ -1,16 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import { beforeAll, describe, expect, it } from 'vitest';
 import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from '@veil/core';
 import {
+  generateKeyPair,
+  type KeyPair,
+  type MembershipClaims,
   PairwiseKeyManager,
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-  generateKeyPair,
-  type KeyPair,
-  type MembershipClaims,
 } from '@veil/sd-jwt';
-import { Wallet, approveAll, approveOnly, denyAll } from '../src/index.js';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { approveAll, approveOnly, denyAll, Wallet } from '../src/index.js';
 
 const ISSUER_ID = 'https://issuer.veil.dev';
 const CLAIMS: MembershipClaims = {
@@ -76,7 +76,12 @@ describe('consent and scope-based disclosure', () => {
       ConsentDeniedError,
     );
     expect(wallet.consentLog()).toEqual([
-      { verifierId: 'https://insurer.example', requested: ['category_sports'], approved: [], granted: false },
+      {
+        verifierId: 'https://insurer.example',
+        requested: ['category_sports'],
+        approved: [],
+        granted: false,
+      },
     ]);
   });
 

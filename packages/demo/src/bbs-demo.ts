@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import type { PresentationRequest } from '@veil/core';
 import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '@veil/bbs';
+import type { PresentationRequest } from '@veil/core';
 
 const CLAIMS: MembershipClaims = {
   user_id: 'u_8f3a21',
@@ -11,7 +11,12 @@ const CLAIMS: MembershipClaims = {
 };
 
 function requestFrom(verifierId: string): PresentationRequest {
-  return { verifierId, requestedClaims: ['category_sports'], nonce: randomUUID(), audience: verifierId };
+  return {
+    verifierId,
+    requestedClaims: ['category_sports'],
+    nonce: randomUUID(),
+    audience: verifierId,
+  };
 }
 
 const proofOf = (payload: string): string => JSON.parse(payload).proof;
@@ -46,7 +51,9 @@ async function main(): Promise<void> {
   console.log('3. Unlinkability: the two proofs share no bytes.');
   console.log(`   proofs identical? ${proofOf(toGym.payload) === proofOf(toInsurer.payload)}\n`);
 
-  console.log(`4. Timing on this machine: prove ~${proveMs.toFixed(1)} ms, verify ~${verifyMs.toFixed(1)} ms`);
+  console.log(
+    `4. Timing on this machine: prove ~${proveMs.toFixed(1)} ms, verify ~${verifyMs.toFixed(1)} ms`,
+  );
 }
 
 main().catch((error) => {
