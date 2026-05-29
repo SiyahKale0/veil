@@ -8,3 +8,4 @@ export {
 export { SdJwtIssuer } from './issuer.js';
 export { SdJwtPresenter } from './presenter.js';
 export { SdJwtVerifier } from './verifier.js';
+export { PairwiseKeyManager } from './pairwise.js';

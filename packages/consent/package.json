@@ -1,0 +1,15 @@
+{
+  "name": "@veil/consent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@veil/core": "0.1.0"
+  },
+  "devDependencies": {
+    "@veil/sd-jwt": "0.1.0"
+  }
+}

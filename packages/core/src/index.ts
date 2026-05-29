@@ -51,6 +51,27 @@ export interface Verifier {
   verify(presentation: Presentation, request: PresentationRequest): Promise<DisclosedClaims>;
 }
 
+/** The user's answer to a verifier's request. */
+export interface ConsentDecision {
+  /** Whether the user agreed to share anything at all. */
+  approved: boolean;
+  /** The subset of requested claims the user agreed to disclose. */
+  approvedClaims: string[];
+}
+
+/** Asks the user whether, and what, to disclose for a given request. */
+export interface ConsentManager {
+  request(request: PresentationRequest): Promise<ConsentDecision>;
+}
+
+/** Raised when the user declines a request; no data is presented. */
+export class ConsentDeniedError extends Error {
+  constructor(message = 'the user declined to share the requested data') {
+    super(message);
+    this.name = 'ConsentDeniedError';
+  }
+}
+
 /** Persists the holder's credentials. */
 export interface CredentialStore {
   put(id: string, credential: Credential): Promise<void>;

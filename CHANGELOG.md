@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0
+
+Cross-app presentation with consent and pairwise identity.
+
+- `@veil/core` — `ConsentManager` and `ConsentDecision` contracts plus
+  `ConsentDeniedError`.
+- `@veil/consent` — `Wallet` runs every presentation through a consent step and
+  discloses only the approved claims, even when the verifier asks for more; it
+  keeps an audit log of decisions. Ships `approveAll`, `approveOnly(...)`,
+  `denyAll`, and `CallbackConsentManager`.
+- `@veil/sd-jwt` — `PairwiseKeyManager` hands out a distinct holder key per
+  verifier, so verifiers cannot link the user by the key binding.
+- `npm run demo:consent` walks two apps: the gym gets the one claim it asked
+  for; the insurer asks for two but the user approves one; a declined request
+  produces nothing; and the two apps see different holder keys.
+- Tests cover scoped disclosure, consent denial producing no presentation, the
+  consent log, and pairwise bindings.
+- README documents the SD-JWT linkability limit that motivates BBS next.
+
 ## 0.2.0
 
 Encrypted vault and zero-knowledge sync.

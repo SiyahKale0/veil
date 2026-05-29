@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@veil/consent": "0.1.0",
     "@veil/core": "0.1.0",
     "@veil/sd-jwt": "0.1.0",
     "@veil/vault": "0.1.0"

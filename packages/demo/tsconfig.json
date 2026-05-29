@@ -6,6 +6,11 @@
     "composite": true,
     "noEmit": false
   },
-  "references": [{ "path": "../core" }, { "path": "../sd-jwt" }, { "path": "../vault" }],
+  "references": [
+    { "path": "../core" },
+    { "path": "../sd-jwt" },
+    { "path": "../vault" },
+    { "path": "../consent" }
+  ],
   "include": ["src"]
 }
