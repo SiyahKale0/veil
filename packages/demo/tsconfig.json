@@ -10,7 +10,8 @@
     { "path": "../core" },
     { "path": "../sd-jwt" },
     { "path": "../vault" },
-    { "path": "../consent" }
+    { "path": "../consent" },
+    { "path": "../bbs" }
   ],
   "include": ["src"]
 }

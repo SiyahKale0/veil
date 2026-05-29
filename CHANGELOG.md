@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.0
+
+BBS selective disclosure with multi-presentation unlinkability.
+
+- `@veil/bbs` — `BbsIssuer`, `BbsPresenter` and `BbsVerifier` on
+  `@docknetwork/crypto-wasm-ts` (Rust→WASM, BLS12-381). They implement the same
+  `Presenter` / `Verifier` contracts as the SD-JWT scheme.
+- A single credential produces re-randomized proofs, so two presentations cannot
+  be linked — no batch issuance, unlike the SD-JWT pairwise approach.
+- Proofs are bound to the verifier's nonce and audience to block replay.
+- `npm run demo:bbs` issues one credential, presents it to two verifiers, shows
+  the proofs share no bytes, and prints prove/verify timings (~20 ms each here).
+- Tests cover disclosure, hidden claims, the unlinkability (collusion) check,
+  wrong nonce / audience / issuer key, and a contract test that runs the same
+  flow through both the SD-JWT and BBS schemes.
+
+Alignment note: the library implements the BBS proof-of-knowledge scheme with
+selective disclosure on BLS12-381, in line with the IRTF CFRG BBS work. Exact
+byte-level conformance to a specific draft ciphersuite has not been verified and
+remains open before any production use.
+
 ## 0.3.0
 
 Cross-app presentation with consent and pairwise identity.

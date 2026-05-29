@@ -26,6 +26,7 @@ packages/
   sd-jwt    SD-JWT-VC issuer, presenter, verifier, pairwise keys
   vault     encrypted-at-rest credential store and zero-knowledge sync
   consent   consent step and the wallet that enforces scope-based disclosure
+  bbs       BBS scheme: selective disclosure with unlinkable presentations
   demo      end-to-end command-line walkthroughs
 ```
 
@@ -38,8 +39,11 @@ The holder shows a different key to each verifier (`PairwiseKeyManager`), so two
 verifiers cannot link the user by the key binding. With SD-JWT this costs one
 credential per verifier (batch issuance), and it only goes so far: the issuer's
 signature and the disclosed values are still correlatable across presentations.
-Unlinkability that does not need batch issuance — re-randomized proofs from a
-single credential — is the job of the BBS scheme in a later phase.
+
+The `bbs` package removes that cost: a single credential yields a freshly
+re-randomized proof on every presentation, so two presentations are unlinkable
+without issuing multiple credentials. Both schemes sit behind the same
+`Presenter` / `Verifier` contracts, so callers do not change.
 
 ## Try it
 
@@ -48,6 +52,7 @@ npm install
 npm run demo           # issue -> present -> verify, start to finish
 npm run demo:vault     # encrypt, sync, restore on another device
 npm run demo:consent   # two apps, consent, scope-based disclosure, pairwise keys
+npm run demo:bbs       # one credential, two unlinkable presentations
 npm test               # unit + negative-path tests
 npm run typecheck
 ```

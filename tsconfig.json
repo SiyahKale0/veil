@@ -5,6 +5,7 @@
     { "path": "packages/sd-jwt" },
     { "path": "packages/vault" },
     { "path": "packages/consent" },
+    { "path": "packages/bbs" },
     { "path": "packages/demo" }
   ]
 }

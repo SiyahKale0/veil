@@ -12,6 +12,7 @@
     "demo": "tsx packages/demo/src/demo.ts",
     "demo:vault": "tsx packages/demo/src/vault-demo.ts",
     "demo:consent": "tsx packages/demo/src/consent-demo.ts",
+    "demo:bbs": "tsx packages/demo/src/bbs-demo.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b"
