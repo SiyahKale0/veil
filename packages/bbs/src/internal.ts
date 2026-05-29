@@ -1,9 +1,8 @@
 import { createRequire } from 'node:module';
-import type { PresentationRequest } from '@veil/core';
-import { FIELDS } from './membership.js';
+import type { CredentialSchema, PresentationRequest } from '@veil/core';
 
-// crypto-wasm-ts is CommonJS; load it via require so resolution is predictable
-// under NodeNext. Types still come from the package declarations.
+// crypto-wasm-ts is CommonJS; load it via require for predictable NodeNext
+// resolution. Types still come from the package declarations.
 export const lib = createRequire(import.meta.url)(
   '@docknetwork/crypto-wasm-ts',
 ) as typeof import('@docknetwork/crypto-wasm-ts');
@@ -14,14 +13,9 @@ export const utf8 = (text: string): Uint8Array => encoder.encode(text);
 export const toB64 = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64url');
 export const fromB64 = (text: string): Uint8Array => new Uint8Array(Buffer.from(text, 'base64url'));
 
-// Nothing-up-my-sleeve label: signature params derive deterministically from it,
-// so issuer, holder and verifier all reconstruct identical params.
-const LABEL = utf8('veil-bbs-membership-v1');
-
 let readyPromise: Promise<void> | null = null;
-let params: InstanceType<typeof lib.BBSSignatureParams> | null = null;
+const paramsBySchema = new Map<string, InstanceType<typeof lib.BBSSignatureParams>>();
 
-/** Initializes the BBS WASM module once. */
 export async function ensureReady(): Promise<void> {
   if (!readyPromise) {
     readyPromise = Promise.resolve(lib.initializeWasm());
@@ -29,10 +23,19 @@ export async function ensureReady(): Promise<void> {
   await readyPromise;
 }
 
-/** The shared signature params for our fixed message layout. Call after {@link ensureReady}. */
-export function getParams(): InstanceType<typeof lib.BBSSignatureParams> {
+// Nothing-up-my-sleeve label derived from the schema, so the same schema yields
+// the same params for issuer, holder and verifier, and different schemas don't.
+function schemaLabel(schema: CredentialSchema): string {
+  return `veil-bbs/v1/${schema.map((definition) => definition.name).join(',')}`;
+}
+
+/** Deterministic signature params for a schema. Call after {@link ensureReady}. */
+export function getParams(schema: CredentialSchema): InstanceType<typeof lib.BBSSignatureParams> {
+  const label = schemaLabel(schema);
+  let params = paramsBySchema.get(label);
   if (!params) {
-    params = lib.BBSSignatureParams.generate(FIELDS.length, LABEL);
+    params = lib.BBSSignatureParams.generate(schema.length, utf8(label));
+    paramsBySchema.set(label, params);
   }
   return params;
 }

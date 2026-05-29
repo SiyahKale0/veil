@@ -1,6 +1,7 @@
 import {
   asString,
   asStringRecord,
+  type CredentialSchema,
   type DisclosedClaims,
   MAX_PAYLOAD_BYTES,
   type NonceStore,
@@ -11,7 +12,7 @@ import {
   type Verifier,
 } from '@veil/core';
 import { challenge, ensureReady, fromB64, getParams, lib, utf8 } from './internal.js';
-import { FIELDS } from './membership.js';
+import { membershipSchema } from './membership.js';
 
 /**
  * Verifies BBS presentations against the issuer's public key, checking the proof
@@ -23,6 +24,7 @@ export class BbsVerifier implements Verifier {
   constructor(
     issuerPublicKey: string,
     private readonly nonceStore?: NonceStore,
+    private readonly schema: CredentialSchema = membershipSchema,
   ) {
     this.publicKey = new lib.BBSPublicKey(fromB64(issuerPublicKey));
   }
@@ -33,7 +35,8 @@ export class BbsVerifier implements Verifier {
     }
 
     await ensureReady();
-    const params = getParams();
+    const params = getParams(this.schema);
+    const names = this.schema.map((definition) => definition.name);
 
     // Validate the untrusted payload before touching any crypto.
     const raw = parseJsonObject(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
@@ -42,7 +45,7 @@ export class BbsVerifier implements Verifier {
 
     const revealedMsgs = new Map<number, Uint8Array>();
     for (const [name, value] of Object.entries(revealed)) {
-      const index = FIELDS.indexOf(name as (typeof FIELDS)[number]);
+      const index = names.indexOf(name);
       if (index < 0) {
         throw new VerificationError(`unknown claim: ${name}`);
       }

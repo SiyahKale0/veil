@@ -1,4 +1,6 @@
-/** The credential type (vct) used by the membership credential in this phase. */
+import type { CredentialSchema } from '@veil/core';
+
+/** The credential type (vct) used by the membership credential. */
 export const MEMBERSHIP_VCT = 'https://veil.dev/credentials/membership/v1';
 
 /**
@@ -8,17 +10,17 @@ export const MEMBERSHIP_VCT = 'https://veil.dev/credentials/membership/v1';
  * presentation time which to reveal. The intended use: reveal `category_sports`
  * while `user_id`, `email` and `tier` stay hidden.
  */
-export interface MembershipClaims {
+export type MembershipClaims = {
   user_id: string;
   email: string;
   tier: string;
   category_sports: string;
-}
+};
 
-/** Claim keys made selectively disclosable when the credential is issued. */
-export const DISCLOSABLE_CLAIMS = [
-  'user_id',
-  'email',
-  'tier',
-  'category_sports',
-] as const satisfies ReadonlyArray<keyof MembershipClaims>;
+/** The default schema. Any other {@link CredentialSchema} can be used instead. */
+export const membershipSchema: CredentialSchema = [
+  { name: 'user_id', type: 'string' },
+  { name: 'email', type: 'string' },
+  { name: 'tier', type: 'string' },
+  { name: 'category_sports', type: 'string' },
+];

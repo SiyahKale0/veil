@@ -1,6 +1,12 @@
-import type { Credential, Presentation, PresentationRequest, Presenter } from '@veil/core';
+import type {
+  Credential,
+  CredentialSchema,
+  Presentation,
+  PresentationRequest,
+  Presenter,
+} from '@veil/core';
 import { challenge, ensureReady, fromB64, getParams, lib, toB64, utf8 } from './internal.js';
-import { FIELDS } from './membership.js';
+import { membershipSchema } from './membership.js';
 
 interface BbsCredential {
   fields: string[];
@@ -14,15 +20,18 @@ interface BbsCredential {
  * credential cannot be linked to each other.
  */
 export class BbsPresenter implements Presenter {
+  constructor(private readonly schema: CredentialSchema = membershipSchema) {}
+
   async present(request: PresentationRequest, credential: Credential): Promise<Presentation> {
     await ensureReady();
-    const params = getParams();
+    const params = getParams(this.schema);
     const parsed = JSON.parse(credential.raw) as BbsCredential;
     const messages = parsed.values.map(utf8);
     const signature = new lib.BBSSignature(fromB64(parsed.signature));
 
+    const names = this.schema.map((definition) => definition.name);
     const revealedIndices = request.requestedClaims.map((name) => {
-      const index = FIELDS.indexOf(name as (typeof FIELDS)[number]);
+      const index = names.indexOf(name);
       if (index < 0) {
         throw new Error(`unknown claim: ${name}`);
       }
@@ -44,7 +53,7 @@ export class BbsPresenter implements Presenter {
 
     const revealed: Record<string, string> = {};
     for (const index of revealedIndices) {
-      revealed[FIELDS[index]] = parsed.values[index];
+      revealed[names[index]] = parsed.values[index];
     }
 
     const payload = JSON.stringify({ proof: toB64(proof.bytes), revealed });

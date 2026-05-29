@@ -76,6 +76,14 @@ export { ConsentDeniedError, MalformedInputError, VeilError, VerificationError }
 export { InMemoryStore } from './memory-store.js';
 export { InMemoryNonceStore, type NonceStore } from './nonce-store.js';
 export {
+  type ClaimDefinition,
+  type ClaimType,
+  type ClaimValues,
+  type CredentialSchema,
+  claimNames,
+  validateClaims,
+} from './schema.js';
+export {
   asIntInRange,
   asObject,
   asString,

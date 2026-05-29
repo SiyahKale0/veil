@@ -11,6 +11,11 @@
 - Freshness and lifecycle: single-use, time-limited nonces (`InMemoryNonceStore`)
   can be wired into any verifier to reject unknown, expired or replayed nonces;
   SD-JWT credentials now carry and enforce an expiry.
+- General-purpose credentials: a `CredentialSchema` of named, typed claims drives
+  issuance, presentation and verification, so any credential type can be defined
+  rather than the built-in membership one. SD-JWT and BBS are both schema-driven
+  (membership stays the default). The ZK age predicate remains age-specific for
+  now; generalizing it to any numeric claim is a follow-up.
 
 ## 0.5.0
 
