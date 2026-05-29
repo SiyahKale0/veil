@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0
+
+Encrypted vault and zero-knowledge sync.
+
+- `@veil/vault` — `EncryptedVaultStore`, a `CredentialStore` that keeps every
+  credential encrypted at rest. Envelope encryption: a per-credential random DEK
+  wrapped by a KEK derived from the password with Argon2id; data sealed with
+  XChaCha20-Poly1305 (libsodium).
+- `export()` produces an opaque blob with no plaintext, key, or password; a
+  credential can be restored on another device from the blob plus the password.
+- `InMemoryVaultSync` stands in for the sync server and only ever holds the
+  opaque blob.
+- Wrong passwords are rejected at unlock via a KEK-sealed check token.
+- `npm run demo:vault` shows the full path: encrypt, sync, reject a wrong
+  password, restore on another device, then present and verify the credential.
+- Tests cover store round-trip, opaque export, cross-device restore, wrong
+  password, and a distinct DEK per credential.
+
 ## 0.1.0
 
 First milestone: SD-JWT-VC selective disclosure.

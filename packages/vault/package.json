@@ -1,11 +1,13 @@
 {
-  "name": "@veil/demo",
+  "name": "@veil/vault",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "dependencies": {
     "@veil/core": "0.1.0",
-    "@veil/sd-jwt": "0.1.0",
-    "@veil/vault": "0.1.0"
+    "libsodium-wrappers-sumo": "^0.7.15"
   }
 }

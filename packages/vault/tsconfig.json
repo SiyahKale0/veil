@@ -3,9 +3,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "composite": true,
-    "noEmit": false
+    "composite": true
   },
-  "references": [{ "path": "../core" }, { "path": "../sd-jwt" }, { "path": "../vault" }],
+  "references": [{ "path": "../core" }],
   "include": ["src"]
 }

@@ -10,11 +10,13 @@
   ],
   "scripts": {
     "demo": "tsx packages/demo/src/demo.ts",
+    "demo:vault": "tsx packages/demo/src/vault-demo.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b"
   },
   "devDependencies": {
+    "@types/libsodium-wrappers": "^0.7.14",
     "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",

@@ -3,6 +3,7 @@
   "references": [
     { "path": "packages/core" },
     { "path": "packages/sd-jwt" },
+    { "path": "packages/vault" },
     { "path": "packages/demo" }
   ]
 }
