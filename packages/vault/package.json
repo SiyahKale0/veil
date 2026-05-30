@@ -1,13 +1,30 @@
 {
   "name": "@veil/vault",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.6.0",
   "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SiyahKale0/veil.git",
+    "directory": "packages/vault"
+  },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
-    "@veil/core": "0.1.0",
+    "@veil/core": "0.6.0",
     "hash-wasm": "4.12.0"
   }
 }

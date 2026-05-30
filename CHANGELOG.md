@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — hardening toward production
+## 0.6.0 — hardening toward production
 
 - Persistence: `@veil/vault` ships a `BlobStore` (`InMemoryBlobStore`,
   `IndexedDbBlobStore`) so a browser wallet can keep the encrypted vault blob

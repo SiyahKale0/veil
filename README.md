@@ -48,12 +48,13 @@ without issuing multiple credentials. Both schemes sit behind the same
 
 ## Predicate proofs
 
-The `zk` package proves a statement about a claim without disclosing it — for
-example "age >= 18" over a privately held age. A composite proof binds a BBS
-proof-of-knowledge to a Bulletproofs++ range proof (transparent, no trusted
-setup) so the bound is checked against the signed age, and the verifier learns
-only true or false. The earlier phase also envisioned a browser WASM-SIMD
-benchmark; that needs a browser harness and is not part of this Node build.
+The `zk` package proves predicates over numeric claims, for example `age >= 18`
+or `balance >= 100`, without revealing the claim value. A composite proof binds a
+BBS proof-of-knowledge to a Bulletproofs++ range proof (transparent, no trusted
+setup), so the bound is checked against the signed claim and the verifier learns
+only true or false. Browser timings are available through `npm run bench:browser`;
+a SIMD on/off comparison is not exposed because the WASM build uses whatever the
+runtime provides.
 
 ## Try it
 
