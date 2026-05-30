@@ -1,16 +1,26 @@
-import { createRequire } from 'node:module';
-
-// crypto-wasm-ts is CommonJS; load it via require for predictable NodeNext
-// resolution. Types still come from the package declarations.
-export const lib = createRequire(import.meta.url)(
-  '@docknetwork/crypto-wasm-ts',
-) as typeof import('@docknetwork/crypto-wasm-ts');
+/** The crypto-wasm-ts module type. */
+export type Lib = typeof import('@docknetwork/crypto-wasm-ts');
 
 const encoder = new TextEncoder();
 export const utf8 = (text: string): Uint8Array => encoder.encode(text);
 
-export const toB64 = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64url');
-export const fromB64 = (text: string): Uint8Array => new Uint8Array(Buffer.from(text, 'base64url'));
+// Isomorphic base64url (no Node Buffer), so this runs in the browser too.
+export const toB64 = (bytes: Uint8Array): string => {
+  let binary = '';
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+export const fromB64 = (text: string): Uint8Array => {
+  const binary = atob(text.replace(/-/g, '+').replace(/_/g, '/'));
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    out[i] = binary.charCodeAt(i);
+  }
+  return out;
+};
 
 /** Message layout. The age sits at AGE_INDEX and is signed as a positive integer. */
 export const FIELDS = ['user_id', 'age'] as const;
@@ -22,29 +32,61 @@ export const MAX_AGE = 150;
 const PARAMS_LABEL = utf8('veil-zk-age-params-v1');
 const BPP_LABEL = utf8('veil-zk-age-bpp-v1');
 
+let libRef: Lib | null = null;
 let readyPromise: Promise<void> | null = null;
-let sigParams: InstanceType<typeof lib.BBSSignatureParams> | null = null;
-let bppParams: InstanceType<typeof lib.BoundCheckBppParams> | null = null;
+let sigParams: InstanceType<Lib['BBSSignatureParams']> | null = null;
+let bppParams: InstanceType<Lib['BoundCheckBppParams']> | null = null;
+
+// The WASM loader inside crypto-wasm-ts references Node's `Buffer`, which a
+// browser lacks. Provide it (guarded, only when missing) so the package works in
+// a browser with no setup from the caller. In Node the `buffer` import is never
+// reached because `globalThis.Buffer` already exists.
+async function ensureBuffer(): Promise<void> {
+  const scope = globalThis as { Buffer?: unknown };
+  if (typeof scope.Buffer === 'undefined') {
+    const { Buffer } = await import('buffer');
+    scope.Buffer = Buffer;
+  }
+}
+
+// Loaded via a plain dynamic import (not Node's require) so a bundler can resolve
+// it for the browser; crypto-wasm-ts is CommonJS, so the module sits on `default`
+// in some loaders and on the namespace in others.
+async function load(): Promise<void> {
+  await ensureBuffer();
+  const mod = await import('@docknetwork/crypto-wasm-ts');
+  const lib = ((mod as { default?: Lib }).default ?? mod) as Lib;
+  await lib.initializeWasm();
+  libRef = lib;
+}
 
 export async function ensureReady(): Promise<void> {
   if (!readyPromise) {
-    readyPromise = Promise.resolve(lib.initializeWasm());
+    readyPromise = load();
   }
   await readyPromise;
 }
 
+/** The initialized crypto-wasm-ts module. Call after {@link ensureReady}. */
+export function getLib(): Lib {
+  if (!libRef) {
+    throw new Error('ZK module is not initialized; await ensureReady() first');
+  }
+  return libRef;
+}
+
 /** Shared BBS signature params for the age credential. Call after {@link ensureReady}. */
-export function getSigParams(): InstanceType<typeof lib.BBSSignatureParams> {
+export function getSigParams(): InstanceType<Lib['BBSSignatureParams']> {
   if (!sigParams) {
-    sigParams = lib.BBSSignatureParams.generate(FIELDS.length, PARAMS_LABEL);
+    sigParams = getLib().BBSSignatureParams.generate(FIELDS.length, PARAMS_LABEL);
   }
   return sigParams;
 }
 
 /** Transparent Bulletproofs++ params for the range proof (no trusted setup). */
-export function getBppParams(): InstanceType<typeof lib.BoundCheckBppParams> {
+export function getBppParams(): InstanceType<Lib['BoundCheckBppParams']> {
   if (!bppParams) {
-    bppParams = new lib.BoundCheckBppParams(BPP_LABEL);
+    bppParams = new (getLib().BoundCheckBppParams)(BPP_LABEL);
   }
   return bppParams;
 }
@@ -54,6 +96,7 @@ export function getBppParams(): InstanceType<typeof lib.BoundCheckBppParams> {
  * age is encoded as a positive integer so a range proof can be made over it.
  */
 export function encodeMessages(userId: string, age: number): Uint8Array[] {
+  const lib = getLib();
   return [
     lib.BBSSignature.encodeMessageForSigning(utf8(userId)),
     lib.BBSSignature.encodePositiveNumberForSigning(age),

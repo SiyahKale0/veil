@@ -16,6 +16,21 @@
   rather than the built-in membership one. SD-JWT and BBS are both schema-driven
   (membership stays the default). The ZK age predicate remains age-specific for
   now; generalizing it to any numeric claim is a follow-up.
+- Browser support: `core`, `sd-jwt` and `consent` are now isomorphic. SD-JWT uses
+  the Web Crypto API instead of a Node-only crypto package, so the issue →
+  present → verify flow runs in a browser as well as in Node. `bbs` and `zk` now
+  load their WASM library with a plain dynamic `import()` instead of Node's
+  `require`, so a WASM-aware bundler can run them in a browser (verified in Node
+  and Vite). `vault` is now isomorphic too: it switched from libsodium to Argon2id
+  via hash-wasm plus AES-256-GCM via the Web Crypto API (the AEAD alternative
+  ADR-0003 already allowed), keeping memory-hard key derivation while running in
+  the browser.
+- Verified in a real browser: a headless-Chromium smoke test
+  (`npm run test:browser`, Vitest browser mode + Playwright) runs the SD-JWT,
+  vault, BBS and ZK flows. All pass with no caller setup: `bbs` and `zk` install
+  a guarded `Buffer` shim themselves (a no-op in Node) so their WASM loader works
+  in the browser, and their base64 helpers were made isomorphic (they previously
+  used Node's `Buffer`).
 
 ## 0.5.0
 

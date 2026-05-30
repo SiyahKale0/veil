@@ -15,6 +15,7 @@
     "demo:bbs": "tsx packages/demo/src/bbs-demo.ts",
     "demo:zk": "tsx packages/demo/src/zk-demo.ts",
     "test": "vitest run",
+    "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "build": "tsc -b",
@@ -24,8 +25,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@types/libsodium-wrappers": "0.7.14",
     "@types/node": "22.19.19",
+    "@vitest/browser": "4.1.7",
+    "@vitest/browser-playwright": "4.1.7",
+    "playwright": "1.60.0",
     "tsx": "4.22.3",
     "typescript": "5.9.3",
     "vitest": "4.1.7"

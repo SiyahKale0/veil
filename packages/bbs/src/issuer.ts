@@ -5,13 +5,13 @@ import {
   claimNames,
   validateClaims,
 } from '@veil/core';
-import { ensureReady, getParams, lib, toB64, utf8 } from './internal.js';
+import { ensureReady, getLib, getParams, type Lib, toB64, utf8 } from './internal.js';
 import { BBS_MEMBERSHIP_TYPE, membershipSchema } from './membership.js';
 
 /** Signs credentials under BBS. Schema-driven; membership by default. */
 export class BbsIssuer {
   private constructor(
-    private readonly secretKey: InstanceType<typeof lib.BBSSecretKey>,
+    private readonly secretKey: InstanceType<Lib['BBSSecretKey']>,
     private readonly publicKeyB64: string,
     private readonly schema: CredentialSchema,
     private readonly type: string,
@@ -27,7 +27,7 @@ export class BbsIssuer {
     type: string = BBS_MEMBERSHIP_TYPE,
   ): Promise<BbsIssuer> {
     await ensureReady();
-    const keypair = lib.BBSKeypair.generate(getParams(schema));
+    const keypair = getLib().BBSKeypair.generate(getParams(schema));
     return new BbsIssuer(keypair.secretKey, toB64(keypair.publicKey.bytes), schema, type);
   }
 
@@ -40,7 +40,7 @@ export class BbsIssuer {
     await ensureReady();
     const ordered = this.schema.map((definition) => String(values[definition.name]));
     const messages = ordered.map(utf8);
-    const signature = lib.BBSSignature.generate(
+    const signature = getLib().BBSSignature.generate(
       messages,
       this.secretKey,
       getParams(this.schema),

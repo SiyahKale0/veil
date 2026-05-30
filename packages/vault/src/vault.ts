@@ -15,12 +15,12 @@ const CHECK_TOKEN = 'veil-vault-check';
 
 // Bounds on KDF params read from an untrusted blob, so a crafted blob cannot
 // trigger an out-of-memory or runaway-CPU denial of service during unlock.
-const KDF_OPS_MIN = 1;
-const KDF_OPS_MAX = 10;
-const KDF_MEM_MIN = 8 * 1024; // 8 KiB
-const KDF_MEM_MAX = 256 * 1024 * 1024; // 256 MiB
-const KDF_ALG_MIN = 1; // argon2i13
-const KDF_ALG_MAX = 2; // argon2id13
+const KDF_ITER_MIN = 1;
+const KDF_ITER_MAX = 10;
+const KDF_MEM_MIN_KIB = 8 * 1024; // 8 MiB
+const KDF_MEM_MAX_KIB = 256 * 1024; // 256 MiB
+const KDF_PAR_MIN = 1;
+const KDF_PAR_MAX = 16;
 
 /** One stored credential: its DEK wrapped by the KEK, and its data under the DEK. */
 interface VaultEntry {
@@ -65,9 +65,24 @@ function validateBlob(blob: string): VaultBlob {
   const kdfObject = asObject(raw.kdf, 'vault blob kdf');
   const kdf: KdfParams = {
     salt: asString(kdfObject.salt, 'vault blob kdf.salt'),
-    opsLimit: asIntInRange(kdfObject.opsLimit, KDF_OPS_MIN, KDF_OPS_MAX, 'vault blob kdf.opsLimit'),
-    memLimit: asIntInRange(kdfObject.memLimit, KDF_MEM_MIN, KDF_MEM_MAX, 'vault blob kdf.memLimit'),
-    alg: asIntInRange(kdfObject.alg, KDF_ALG_MIN, KDF_ALG_MAX, 'vault blob kdf.alg'),
+    iterations: asIntInRange(
+      kdfObject.iterations,
+      KDF_ITER_MIN,
+      KDF_ITER_MAX,
+      'vault blob kdf.iterations',
+    ),
+    memoryKiB: asIntInRange(
+      kdfObject.memoryKiB,
+      KDF_MEM_MIN_KIB,
+      KDF_MEM_MAX_KIB,
+      'vault blob kdf.memoryKiB',
+    ),
+    parallelism: asIntInRange(
+      kdfObject.parallelism,
+      KDF_PAR_MIN,
+      KDF_PAR_MAX,
+      'vault blob kdf.parallelism',
+    ),
   };
 
   const check = asSealedBytes(raw.check, 'vault blob check');

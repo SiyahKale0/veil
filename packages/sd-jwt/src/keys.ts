@@ -1,7 +1,6 @@
-import { ES256 } from '@sd-jwt/crypto-nodejs';
+import { ES256, type Jwk } from './webcrypto.js';
 
-/** A JWK as produced and consumed by the underlying crypto layer (ES256 / P-256). */
-export type Jwk = Awaited<ReturnType<typeof ES256.generateKeyPair>>['publicKey'];
+export type { Jwk };
 
 export interface KeyPair {
   publicKey: Jwk;

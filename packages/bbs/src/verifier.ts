@@ -11,7 +11,7 @@ import {
   VerificationError,
   type Verifier,
 } from '@veil/core';
-import { challenge, ensureReady, fromB64, getParams, lib, utf8 } from './internal.js';
+import { challenge, ensureReady, fromB64, getLib, getParams, utf8 } from './internal.js';
 import { membershipSchema } from './membership.js';
 
 /**
@@ -19,15 +19,11 @@ import { membershipSchema } from './membership.js';
  * and the nonce/audience binding, and returns only the disclosed claims.
  */
 export class BbsVerifier implements Verifier {
-  private readonly publicKey: InstanceType<typeof lib.BBSPublicKey>;
-
   constructor(
-    issuerPublicKey: string,
+    private readonly issuerPublicKey: string,
     private readonly nonceStore?: NonceStore,
     private readonly schema: CredentialSchema = membershipSchema,
-  ) {
-    this.publicKey = new lib.BBSPublicKey(fromB64(issuerPublicKey));
-  }
+  ) {}
 
   async verify(presentation: Presentation, request: PresentationRequest): Promise<DisclosedClaims> {
     if (presentation.format !== 'bbs') {
@@ -35,6 +31,8 @@ export class BbsVerifier implements Verifier {
     }
 
     await ensureReady();
+    const lib = getLib();
+    const publicKey = new lib.BBSPublicKey(fromB64(this.issuerPublicKey));
     const params = getParams(this.schema);
     const names = this.schema.map((definition) => definition.name);
 
@@ -68,7 +66,7 @@ export class BbsVerifier implements Verifier {
       const contribution = proof.challengeContribution(params, true, revealedMsgs);
       const result = proof.verify(
         challenge(contribution, request),
-        this.publicKey,
+        publicKey,
         params,
         true,
         revealedMsgs,

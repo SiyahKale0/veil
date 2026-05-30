@@ -13,8 +13,9 @@ import {
   ensureReady,
   fromB64,
   getBppParams,
+  getLib,
   getSigParams,
-  lib,
+  type Lib,
   MAX_AGE,
   toB64,
   utf8,
@@ -42,7 +43,7 @@ interface AgeCredential {
 /** Issues a BBS credential whose age field can be range-proven. */
 export class ZkAgeIssuer {
   private constructor(
-    private readonly secretKey: InstanceType<typeof lib.BBSSecretKey>,
+    private readonly secretKey: InstanceType<Lib['BBSSecretKey']>,
     private readonly publicKeyB64: string,
   ) {}
 
@@ -52,14 +53,19 @@ export class ZkAgeIssuer {
 
   static async create(): Promise<ZkAgeIssuer> {
     await ensureReady();
-    const keypair = lib.BBSKeypair.generate(getSigParams());
+    const keypair = getLib().BBSKeypair.generate(getSigParams());
     return new ZkAgeIssuer(keypair.secretKey, toB64(keypair.publicKey.bytes));
   }
 
   async issue(claims: AgeClaims): Promise<Credential> {
     await ensureReady();
     const messages = encodeMessages(claims.user_id, claims.age);
-    const signature = lib.BBSSignature.generate(messages, this.secretKey, getSigParams(), false);
+    const signature = getLib().BBSSignature.generate(
+      messages,
+      this.secretKey,
+      getSigParams(),
+      false,
+    );
     const raw = JSON.stringify({
       messages: messages.map(toB64),
       signature: toB64(signature.bytes),
@@ -69,6 +75,7 @@ export class ZkAgeIssuer {
 }
 
 function ageEqualityMetaStatements(signatureStatement: number, boundStatement: number) {
+  const lib = getLib();
   const eq = new lib.WitnessEqualityMetaStatement();
   eq.addWitnessRef(signatureStatement, AGE_INDEX);
   eq.addWitnessRef(boundStatement, 0);
@@ -85,6 +92,7 @@ export class ZkAgeProver {
     context: ProofContext,
   ): Promise<Presentation> {
     await ensureReady();
+    const lib = getLib();
     const parsed = JSON.parse(credential.raw) as AgeCredential;
     const messages = parsed.messages.map(fromB64);
     const signature = new lib.BBSSignature(fromB64(parsed.signature));
@@ -112,14 +120,10 @@ export class ZkAgeProver {
 
 /** Verifies an age-at-least proof against the issuer's public key. */
 export class ZkAgeVerifier {
-  private readonly publicKey: InstanceType<typeof lib.BBSPublicKey>;
-
   constructor(
-    issuerPublicKey: string,
+    private readonly issuerPublicKey: string,
     private readonly nonceStore?: NonceStore,
-  ) {
-    this.publicKey = new lib.BBSPublicKey(fromB64(issuerPublicKey));
-  }
+  ) {}
 
   /**
    * Verifies that the proof shows age >= `minAge`. The verifier chooses `minAge`
@@ -134,6 +138,7 @@ export class ZkAgeVerifier {
       throw new VerificationError(`unsupported presentation format: ${presentation.format}`);
     }
     await ensureReady();
+    const lib = getLib();
     const raw = parseJsonObject(presentation.payload, MAX_PAYLOAD_BYTES, 'presentation.payload');
     const proofB64 = asString(raw.proof, 'presentation.proof');
 
@@ -141,14 +146,10 @@ export class ZkAgeVerifier {
       throw new VerificationError('nonce is stale, unknown, or already used');
     }
 
+    const publicKey = new lib.BBSPublicKey(fromB64(this.issuerPublicKey));
     const statements = new lib.Statements();
     const sigStatement = statements.add(
-      lib.Statement.bbsSignatureVerifierConstantTime(
-        getSigParams(),
-        this.publicKey,
-        new Map(),
-        false,
-      ),
+      lib.Statement.bbsSignatureVerifierConstantTime(getSigParams(), publicKey, new Map(), false),
     );
     const boundStatement = statements.add(
       lib.Statement.boundCheckBppFromCompressedParams(minAge, MAX_AGE, getBppParams()),

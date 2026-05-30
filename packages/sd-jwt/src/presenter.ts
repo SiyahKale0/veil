@@ -1,8 +1,8 @@
-import { digest, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { PresentationFrame } from '@sd-jwt/types';
 import type { Credential, Presentation, PresentationRequest, Presenter } from '@veil/core';
 import type { Jwk } from './keys.js';
+import { digest, ES256 } from './webcrypto.js';
 
 /**
  * Builds presentations from a held credential, disclosing only the claims the

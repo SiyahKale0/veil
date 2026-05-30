@@ -1,4 +1,3 @@
-import { digest, ES256, generateSalt } from '@sd-jwt/crypto-nodejs';
 import type { SdJwtVcPayload } from '@sd-jwt/sd-jwt-vc';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { DisclosureFrame } from '@sd-jwt/types';
@@ -11,6 +10,7 @@ import {
 } from '@veil/core';
 import type { Jwk } from './keys.js';
 import { MEMBERSHIP_VCT, membershipSchema } from './membership.js';
+import { digest, ES256, generateSalt } from './webcrypto.js';
 
 /** Default credential lifetime: one year. */
 const DEFAULT_VALIDITY_SECONDS = 365 * 24 * 60 * 60;

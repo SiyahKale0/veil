@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@docknetwork/crypto-wasm-ts": "0.67.0",
-    "@veil/core": "0.1.0"
+    "@veil/core": "0.1.0",
+    "buffer": "6.0.3"
   }
 }

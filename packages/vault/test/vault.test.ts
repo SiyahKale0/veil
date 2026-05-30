@@ -91,8 +91,8 @@ describe('encrypted vault', () => {
     await vault.put('membership', CRED);
     const blob = JSON.parse(await vault.export()) as VaultBlob;
 
-    // A crafted memLimit that would exhaust memory during key derivation.
-    blob.kdf.memLimit = 64 * 1024 * 1024 * 1024;
+    // A crafted memory size that would exhaust memory during key derivation.
+    blob.kdf.memoryKiB = 64 * 1024 * 1024;
     await expect(EncryptedVaultStore.unlock(PASSWORD, JSON.stringify(blob))).rejects.toThrow(
       MalformedInputError,
     );

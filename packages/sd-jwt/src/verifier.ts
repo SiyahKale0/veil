@@ -1,4 +1,3 @@
-import { digest, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import type { KbVerifier } from '@sd-jwt/types';
 import {
@@ -12,6 +11,7 @@ import {
   type Verifier,
 } from '@veil/core';
 import type { Jwk } from './keys.js';
+import { digest, ES256 } from './webcrypto.js';
 
 /**
  * Verifies SD-JWT-VC presentations: the issuer signature, the holder's

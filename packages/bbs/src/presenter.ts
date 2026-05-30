@@ -5,7 +5,7 @@ import type {
   PresentationRequest,
   Presenter,
 } from '@veil/core';
-import { challenge, ensureReady, fromB64, getParams, lib, toB64, utf8 } from './internal.js';
+import { challenge, ensureReady, fromB64, getLib, getParams, toB64, utf8 } from './internal.js';
 import { membershipSchema } from './membership.js';
 
 interface BbsCredential {
@@ -27,6 +27,7 @@ export class BbsPresenter implements Presenter {
     const params = getParams(this.schema);
     const parsed = JSON.parse(credential.raw) as BbsCredential;
     const messages = parsed.values.map(utf8);
+    const lib = getLib();
     const signature = new lib.BBSSignature(fromB64(parsed.signature));
 
     const names = this.schema.map((definition) => definition.name);

@@ -64,9 +64,30 @@ npm run demo:vault     # encrypt, sync, restore on another device
 npm run demo:consent   # two apps, consent, scope-based disclosure, pairwise keys
 npm run demo:bbs       # one credential, two unlinkable presentations
 npm run demo:zk        # prove age >= 18 without revealing the age
-npm test               # unit + negative-path tests
+npm test               # unit + negative-path tests (Node)
+npm run test:browser   # same flows in headless Chromium (needs: npx playwright install chromium)
 npm run typecheck
 ```
+
+## Browser support
+
+All packages run in both Node and the browser. This is verified by a headless
+Chromium smoke test (`npm run test:browser`) that runs the SD-JWT, vault, BBS and
+ZK flows in a real browser.
+
+| Package | Node | Browser |
+| --- | --- | --- |
+| `core`, `sd-jwt`, `consent`, `vault`, `bbs`, `zk` | yes | yes |
+
+Every package works in the browser with no setup from the caller. `core`,
+`sd-jwt`, `consent` and `vault` use only the Web Crypto API (`globalThis.crypto`),
+standard globals, and (for the vault) Argon2id via the self-contained hash-wasm
+build.
+
+`bbs` and `zk` load `crypto-wasm-ts` with a plain dynamic `import()`. That
+library's WASM loader references Node's `Buffer`, so before loading it the
+packages install a guarded `Buffer` shim (only when one is missing — a no-op in
+Node). The caller does not need a bundler polyfill plugin.
 
 ## Status
 
