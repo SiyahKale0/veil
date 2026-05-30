@@ -2,6 +2,13 @@
 
 ## Unreleased — hardening toward production
 
+- Persistence: `@veil/vault` ships a `BlobStore` (`InMemoryBlobStore`,
+  `IndexedDbBlobStore`) so a browser wallet can keep the encrypted vault blob
+  across reloads. Verified against real IndexedDB in the browser tests.
+- Cross-browser: the browser smoke + persistence tests now run in Chromium,
+  Firefox and WebKit (Safari engine) and all pass, covering Web Crypto, the
+  WASM-backed BBS/ZK flows, and IndexedDB.
+
 - Release and assurance: added an Apache-2.0 `LICENSE` and a `SECURITY.md` with
   the threat model, a security-review checklist, vulnerability reporting, and the
   work still open before production (audit, ciphersuite conformance). `npm run

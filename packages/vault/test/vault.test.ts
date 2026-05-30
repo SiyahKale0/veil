@@ -2,6 +2,7 @@ import { type Credential, MalformedInputError } from '@veil/core';
 import { describe, expect, it } from 'vitest';
 import {
   EncryptedVaultStore,
+  InMemoryBlobStore,
   InMemoryVaultSync,
   type VaultBlob,
   WrongPasswordError,
@@ -77,6 +78,15 @@ describe('encrypted vault', () => {
 
     expect(blob.entries.a.data.ciphertext).not.toEqual(blob.entries.b.data.ciphertext);
     expect(blob.entries.a.wrappedDek.ciphertext).not.toEqual(blob.entries.b.wrappedDek.ciphertext);
+  });
+
+  it('InMemoryBlobStore round-trips and removes', async () => {
+    const store = new InMemoryBlobStore();
+    expect(await store.load('k')).toBeNull();
+    await store.save('k', 'blob-value');
+    expect(await store.load('k')).toBe('blob-value');
+    await store.remove('k');
+    expect(await store.load('k')).toBeNull();
   });
 
   it('rejects a malformed blob', async () => {
