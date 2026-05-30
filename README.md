@@ -128,6 +128,16 @@ Before production, two things are open and need real work:
    interop with other BBS implementations have **not** been verified. That
    requires running the official test vectors and pinning a named ciphersuite.
 
+See [SECURITY.md](SECURITY.md) for the full threat model, the security-review
+checklist, and how to report a vulnerability.
+
+## Building
+
+`npm run build` compiles every package to `dist/` with type declarations. The
+packages are workspace-internal source packages today; the `dist` output is what
+a published npm release would ship, so wiring `exports` to `dist` is the one
+remaining step before publishing to a registry.
+
 ## License
 
-Apache-2.0
+Apache-2.0 — see [LICENSE](LICENSE).

@@ -2,6 +2,12 @@
 
 ## Unreleased — hardening toward production
 
+- Release and assurance: added an Apache-2.0 `LICENSE` and a `SECURITY.md` with
+  the threat model, a security-review checklist, vulnerability reporting, and the
+  work still open before production (audit, ciphersuite conformance). `npm run
+  build` emits `dist` with declarations; wiring `exports` to `dist` is the one
+  remaining step before publishing to a registry.
+
 - Crypto depth: the vault's Argon2id work factors are now tunable via
   `EncryptedVaultStore.create(password, { iterations, memoryKiB, parallelism })`,
   defaulting to the OWASP baseline. Property-based tests (fast-check) check the
