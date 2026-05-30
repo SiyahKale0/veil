@@ -8,6 +8,9 @@
     "url": "git+https://github.com/SiyahKale0/veil.git",
     "directory": "packages/vault"
   },
+  "scripts": {
+    "prepack": "tsc -b"
+  },
   "exports": {
     ".": {
       "development": "./src/index.ts",
