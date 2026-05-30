@@ -1,8 +1,8 @@
+export { type AgeClaims, ZK_AGE_TYPE, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from './age.js';
 export {
-  type AgeClaims,
+  type IssueOptions,
   type ProofContext,
-  ZK_AGE_TYPE,
-  ZkAgeIssuer,
-  ZkAgeProver,
-  ZkAgeVerifier,
-} from './age.js';
+  ZkPredicateIssuer,
+  ZkPredicateProver,
+  ZkPredicateVerifier,
+} from './predicate.js';

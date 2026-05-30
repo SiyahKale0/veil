@@ -1,3 +1,5 @@
+import type { ClaimValues, CredentialSchema } from '@veil/core';
+
 /** The crypto-wasm-ts module type. */
 export type Lib = typeof import('@docknetwork/crypto-wasm-ts');
 
@@ -23,26 +25,23 @@ export const fromB64 = (text: string): Uint8Array => {
 };
 
 /**
- * Message layout: user id, then the age (signed as a positive integer so it can
- * be range-proven), then the expiry (also a positive integer, revealed in the
- * proof so the verifier can enforce it).
+ * Message layout: the schema's claims (string claims hashed, number claims signed
+ * as positive integers so they can be range-proven), then a reserved expiry slot
+ * at the end, revealed in the proof so the verifier can enforce it.
  */
-export const FIELDS = ['user_id', 'age', 'exp'] as const;
-export const AGE_INDEX = 1;
-export const EXP_INDEX = 2;
+export const expIndex = (schema: CredentialSchema): number => schema.length;
 
-/** Upper bound of the range we prove the age falls in. Comfortably above any real age. */
-export const MAX_AGE = 150;
+/** Exclusive upper bound for range proofs (covers ages, years, counts, etc.). */
+export const DEFAULT_UPPER_BOUND = 2 ** 32;
 
 /** Default credential lifetime: one year. */
 export const DEFAULT_VALIDITY_SECONDS = 365 * 24 * 60 * 60;
 
-const PARAMS_LABEL = utf8('veil-zk-age-params-v2');
-const BPP_LABEL = utf8('veil-zk-age-bpp-v1');
+const BPP_LABEL = utf8('veil-zk-bpp-v1');
 
 let libRef: Lib | null = null;
 let readyPromise: Promise<void> | null = null;
-let sigParams: InstanceType<Lib['BBSSignatureParams']> | null = null;
+const sigParamsBySchema = new Map<string, InstanceType<Lib['BBSSignatureParams']>>();
 let bppParams: InstanceType<Lib['BoundCheckBppParams']> | null = null;
 
 // The WASM loader inside crypto-wasm-ts references Node's `Buffer`, which a
@@ -83,12 +82,19 @@ export function getLib(): Lib {
   return libRef;
 }
 
-/** Shared BBS signature params for the age credential. Call after {@link ensureReady}. */
-export function getSigParams(): InstanceType<Lib['BBSSignatureParams']> {
-  if (!sigParams) {
-    sigParams = getLib().BBSSignatureParams.generate(FIELDS.length, PARAMS_LABEL);
+function schemaLabel(schema: CredentialSchema): string {
+  return `veil-zk/v1/${schema.map((d) => `${d.name}:${d.type}`).join(',')}+exp`;
+}
+
+/** Deterministic BBS params for a schema (claims + reserved expiry). Call after {@link ensureReady}. */
+export function getSigParams(schema: CredentialSchema): InstanceType<Lib['BBSSignatureParams']> {
+  const label = schemaLabel(schema);
+  let params = sigParamsBySchema.get(label);
+  if (!params) {
+    params = getLib().BBSSignatureParams.generate(schema.length + 1, utf8(label));
+    sigParamsBySchema.set(label, params);
   }
-  return sigParams;
+  return params;
 }
 
 /** Transparent Bulletproofs++ params for the range proof (no trusted setup). */
@@ -99,20 +105,21 @@ export function getBppParams(): InstanceType<Lib['BoundCheckBppParams']> {
   return bppParams;
 }
 
-/**
- * Encodes the credential messages to field elements. The user id is hashed; the
- * age is encoded as a positive integer so a range proof can be made over it.
- */
-export function encodeMessages(userId: string, age: number, exp: number): Uint8Array[] {
-  const lib = getLib();
-  return [
-    lib.BBSSignature.encodeMessageForSigning(utf8(userId)),
-    lib.BBSSignature.encodePositiveNumberForSigning(age),
-    lib.BBSSignature.encodePositiveNumberForSigning(exp),
-  ];
-}
-
-/** Encodes a number as the same field element used for the expiry message. */
+/** Encodes a number as a positive-integer field element (for the bounded claim and expiry). */
 export function encodeNumber(value: number): Uint8Array {
   return getLib().BBSSignature.encodePositiveNumberForSigning(value);
+}
+
+/**
+ * Encodes the schema's claims to field elements: string claims are hashed, number
+ * claims are encoded as positive integers so they can be range-proven.
+ */
+export function encodeClaims(schema: CredentialSchema, values: ClaimValues): Uint8Array[] {
+  const lib = getLib();
+  return schema.map((definition) => {
+    const value = values[definition.name];
+    return definition.type === 'number'
+      ? lib.BBSSignature.encodePositiveNumberForSigning(value as number)
+      : lib.BBSSignature.encodeMessageForSigning(utf8(String(value)));
+  });
 }

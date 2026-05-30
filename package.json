@@ -16,6 +16,7 @@
     "demo:zk": "tsx packages/demo/src/zk-demo.ts",
     "test": "vitest run",
     "test:browser": "vitest run --config vitest.browser.config.ts",
+    "bench:browser": "vitest run --config vitest.bench.config.ts --reporter=verbose",
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "build": "tsc -b",

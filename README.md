@@ -89,10 +89,44 @@ library's WASM loader references Node's `Buffer`, so before loading it the
 packages install a guarded `Buffer` shim (only when one is missing — a no-op in
 Node). The caller does not need a bundler polyfill plugin.
 
+## Performance
+
+Median prove/verify times in headless Chromium (`npm run bench:browser`), on the
+machine used for development:
+
+| Scheme | prove | verify |
+| --- | --- | --- |
+| SD-JWT | ~0.3 ms | ~0.4 ms |
+| BBS | ~17 ms | ~20 ms |
+| ZK age predicate | ~480 ms | ~200 ms |
+
+These are the same order of magnitude as Node. The WASM uses whatever the runtime
+provides (e.g. SIMD), so a SIMD on/off comparison isn't exposed; mobile browsers
+will be slower (typically a few times), which mainly affects the ZK predicate.
+
 ## Status
 
 Not production-ready. The cryptography here has not been audited; treat this as
 a working reference, not a deployable wallet.
+
+### Cryptographic basis and conformance
+
+- **SD-JWT** follows RFC 9901 via `@sd-jwt` (OpenWallet Foundation); ES256 / SHA-256
+  come from the Web Crypto API.
+- **Vault** uses Argon2id (hash-wasm) for key derivation and AES-256-GCM (Web
+  Crypto) for authenticated encryption.
+- **BBS / ZK** use `@docknetwork/crypto-wasm-ts` (BLS12-381): a BBS
+  proof-of-knowledge with selective disclosure, and a Bulletproofs++ range proof
+  (transparent, no trusted setup).
+
+Before production, two things are open and need real work:
+
+1. **An independent security audit** of the whole stack.
+2. **Ciphersuite conformance / interop.** The BBS and ZK schemes follow the
+   library's own BBS construction; byte-level conformance to a specific published
+   ciphersuite (IETF `draft-irtf-cfrg-bbs-signatures`, W3C `vc-di-bbs`) and
+   interop with other BBS implementations have **not** been verified. That
+   requires running the official test vectors and pinning a named ciphersuite.
 
 ## License
 

@@ -27,9 +27,11 @@
   SD-JWT credentials now carry and enforce an expiry.
 - General-purpose credentials: a `CredentialSchema` of named, typed claims drives
   issuance, presentation and verification, so any credential type can be defined
-  rather than the built-in membership one. SD-JWT and BBS are both schema-driven
-  (membership stays the default). The ZK age predicate remains age-specific for
-  now; generalizing it to any numeric claim is a follow-up.
+  rather than the built-in membership one. SD-JWT and BBS are schema-driven
+  (membership stays the default). The ZK predicate is schema-driven too:
+  `ZkPredicateIssuer` / `ZkPredicateProver` / `ZkPredicateVerifier` prove
+  "claim >= N" over any numeric claim (e.g. a balance threshold), with the
+  age helpers (`ZkAge*`) kept as a thin convenience.
 - Browser support: `core`, `sd-jwt` and `consent` are now isomorphic. SD-JWT uses
   the Web Crypto API instead of a Node-only crypto package, so the issue →
   present → verify flow runs in a browser as well as in Node. `bbs` and `zk` now
@@ -45,6 +47,10 @@
   a guarded `Buffer` shim themselves (a no-op in Node) so their WASM loader works
   in the browser, and their base64 helpers were made isomorphic (they previously
   used Node's `Buffer`).
+- Performance: `npm run bench:browser` measures prove/verify times in headless
+  Chromium (SD-JWT sub-millisecond, BBS ~20 ms, ZK predicate a few hundred ms).
+  The original WASM-SIMD before/after benchmark isn't exposed (the build uses
+  whatever the runtime provides), so this reports real browser timings instead.
 
 ## 0.5.0
 
