@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { CredentialSchema } from '@veil/core';
+import type { CredentialSchema } from 'veil-core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   type ProofContext,

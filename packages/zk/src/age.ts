@@ -4,7 +4,7 @@ import type {
   KeyResolver,
   NonceStore,
   Presentation,
-} from '@veil/core';
+} from 'veil-core';
 import {
   type IssueOptions,
   type ProofContext,

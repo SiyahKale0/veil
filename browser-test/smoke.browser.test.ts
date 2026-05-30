@@ -1,8 +1,8 @@
-import { BbsIssuer, BbsPresenter, BbsVerifier } from '@veil/bbs';
-import type { Credential, PresentationRequest } from '@veil/core';
-import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from '@veil/sd-jwt';
-import { EncryptedVaultStore } from '@veil/vault';
-import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '@veil/zk';
+import { BbsIssuer, BbsPresenter, BbsVerifier } from 'veil-bbs';
+import type { Credential, PresentationRequest } from 'veil-core';
+import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from 'veil-sd-jwt';
+import { EncryptedVaultStore } from 'veil-vault';
+import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from 'veil-zk';
 import { describe, expect, it } from 'vitest';
 
 const CLAIMS = {

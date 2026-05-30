@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { Credential, Presenter, Verifier } from '@veil/core';
-import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from '@veil/sd-jwt';
+import type { Credential, Presenter, Verifier } from 'veil-core';
+import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from 'veil-sd-jwt';
 import { describe, expect, it } from 'vitest';
 import { BbsIssuer, BbsPresenter, BbsVerifier } from '../src/index.js';
 
@@ -16,7 +16,7 @@ interface Scheme {
   setup(): Promise<{ credential: Credential; presenter: Presenter; verifier: Verifier }>;
 }
 
-// Both schemes are wired up only through the shared @veil/core contracts.
+// Both schemes are wired up only through the shared veil-core contracts.
 const schemes: Scheme[] = [
   {
     name: 'sd-jwt',

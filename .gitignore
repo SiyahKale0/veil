@@ -6,6 +6,7 @@ coverage/
 *.tsbuildinfo
 .env
 .env.*
+.npmrc
 .DS_Store
 
 # local planning note, not part of the project

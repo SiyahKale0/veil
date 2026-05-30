@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import type { PresentationRequest } from '@veil/core';
+import type { PresentationRequest } from 'veil-core';
 import {
   generateKeyPair,
   type MembershipClaims,
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-} from '@veil/sd-jwt';
-import { EncryptedVaultStore, InMemoryVaultSync, WrongPasswordError } from '@veil/vault';
+} from 'veil-sd-jwt';
+import { EncryptedVaultStore, InMemoryVaultSync, WrongPasswordError } from 'veil-vault';
 
 const PASSWORD = 'correct horse battery staple';
 

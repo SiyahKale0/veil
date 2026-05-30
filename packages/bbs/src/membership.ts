@@ -1,4 +1,4 @@
-import type { CredentialSchema } from '@veil/core';
+import type { CredentialSchema } from 'veil-core';
 
 /** The credential type for the BBS membership credential. */
 export const BBS_MEMBERSHIP_TYPE = 'https://veil.dev/credentials/membership-bbs/v1';

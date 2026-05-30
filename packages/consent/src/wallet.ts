@@ -5,7 +5,7 @@ import {
   type Presentation,
   type PresentationRequest,
   type Presenter,
-} from '@veil/core';
+} from 'veil-core';
 
 /** A record of one consent decision, for the user's own audit trail. */
 export interface ConsentLogEntry {

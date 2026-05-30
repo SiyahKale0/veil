@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from '@veil/core';
+import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from 'veil-core';
 import {
   generateKeyPair,
   type KeyPair,
@@ -8,7 +8,7 @@ import {
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-} from '@veil/sd-jwt';
+} from 'veil-sd-jwt';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { approveAll, approveOnly, denyAll, Wallet } from '../src/index.js';
 

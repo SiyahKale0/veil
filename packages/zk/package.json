@@ -1,5 +1,5 @@
 {
-  "name": "@veil/zk",
+  "name": "veil-zk",
   "version": "0.6.0",
   "type": "module",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@docknetwork/crypto-wasm-ts": "0.67.0",
-    "@veil/core": "0.6.0",
+    "veil-core": "0.6.0",
     "buffer": "6.0.3"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@veil/vault",
+  "name": "veil-vault",
   "version": "0.6.0",
   "type": "module",
   "license": "Apache-2.0",
@@ -27,7 +27,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@veil/core": "0.6.0",
+    "veil-core": "0.6.0",
     "hash-wasm": "4.12.0"
   }
 }

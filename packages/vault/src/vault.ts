@@ -7,7 +7,7 @@ import {
   MAX_BLOB_BYTES,
   parseJsonObject,
   VeilError,
-} from '@veil/core';
+} from 'veil-core';
 import {
   deriveKek,
   type KdfOptions,

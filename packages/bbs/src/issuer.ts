@@ -4,7 +4,7 @@ import {
   type CredentialSchema,
   claimNames,
   validateClaims,
-} from '@veil/core';
+} from 'veil-core';
 import {
   DEFAULT_VALIDITY_SECONDS,
   ensureReady,

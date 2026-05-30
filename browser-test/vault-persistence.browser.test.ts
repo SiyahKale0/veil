@@ -1,4 +1,4 @@
-import { EncryptedVaultStore, IndexedDbBlobStore } from '@veil/vault';
+import { EncryptedVaultStore, IndexedDbBlobStore } from 'veil-vault';
 import { describe, expect, it } from 'vitest';
 
 describe('vault persistence (IndexedDB)', () => {

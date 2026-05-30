@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { approveAll, approveOnly, denyAll, Wallet } from '@veil/consent';
-import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from '@veil/core';
+import { approveAll, approveOnly, denyAll, Wallet } from 'veil-consent';
+import { ConsentDeniedError, InMemoryStore, type PresentationRequest } from 'veil-core';
 import {
   generateKeyPair,
   type MembershipClaims,
@@ -8,7 +8,7 @@ import {
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-} from '@veil/sd-jwt';
+} from 'veil-sd-jwt';
 
 const CLAIMS: MembershipClaims = {
   user_id: 'u_8f3a21',

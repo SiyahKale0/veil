@@ -12,7 +12,7 @@ import {
   parseJsonObject,
   VerificationError,
   type Verifier,
-} from '@veil/core';
+} from 'veil-core';
 import { challenge, ensureReady, expIndex, fromB64, getLib, getParams, utf8 } from './internal.js';
 import { membershipSchema } from './membership.js';
 

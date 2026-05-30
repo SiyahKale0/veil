@@ -1,5 +1,5 @@
 {
-  "name": "@veil/core",
+  "name": "veil-core",
   "version": "0.6.0",
   "type": "module",
   "license": "Apache-2.0",

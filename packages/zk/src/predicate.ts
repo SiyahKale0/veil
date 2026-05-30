@@ -11,7 +11,7 @@ import {
   parseJsonObject,
   VerificationError,
   validateClaims,
-} from '@veil/core';
+} from 'veil-core';
 import {
   DEFAULT_UPPER_BOUND,
   DEFAULT_VALIDITY_SECONDS,

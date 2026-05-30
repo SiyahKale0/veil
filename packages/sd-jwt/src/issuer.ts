@@ -7,7 +7,7 @@ import {
   type CredentialSchema,
   claimNames,
   validateClaims,
-} from '@veil/core';
+} from 'veil-core';
 import type { Jwk } from './keys.js';
 import { MEMBERSHIP_VCT, membershipSchema } from './membership.js';
 import { digest, ES256, generateSalt } from './webcrypto.js';

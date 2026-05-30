@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { keyring, type PresentationRequest, VerificationError } from '@veil/core';
+import { keyring, type PresentationRequest, VerificationError } from 'veil-core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   generateKeyPair,

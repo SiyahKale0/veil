@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '@veil/zk';
+import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from 'veil-zk';
 
 function context(): ProofContext {
   return { nonce: randomUUID(), audience: 'https://bar.example' };

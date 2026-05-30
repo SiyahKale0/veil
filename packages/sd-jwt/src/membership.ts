@@ -1,4 +1,4 @@
-import type { CredentialSchema } from '@veil/core';
+import type { CredentialSchema } from 'veil-core';
 
 /** The credential type (vct) used by the membership credential. */
 export const MEMBERSHIP_VCT = 'https://veil.dev/credentials/membership/v1';

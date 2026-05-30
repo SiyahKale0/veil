@@ -1,4 +1,4 @@
-import type { ConsentDecision, ConsentManager, PresentationRequest } from '@veil/core';
+import type { ConsentDecision, ConsentManager, PresentationRequest } from 'veil-core';
 
 type Prompt = (request: PresentationRequest) => ConsentDecision | Promise<ConsentDecision>;
 

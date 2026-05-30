@@ -1,7 +1,7 @@
-import { BbsIssuer, BbsPresenter, BbsVerifier } from '@veil/bbs';
-import type { PresentationRequest } from '@veil/core';
-import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from '@veil/sd-jwt';
-import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '@veil/zk';
+import { BbsIssuer, BbsPresenter, BbsVerifier } from 'veil-bbs';
+import type { PresentationRequest } from 'veil-core';
+import { generateKeyPair, SdJwtIssuer, SdJwtPresenter, SdJwtVerifier } from 'veil-sd-jwt';
+import { ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from 'veil-zk';
 import { describe, expect, it } from 'vitest';
 
 const CLAIMS = { user_id: 'u', email: 'a@b.c', tier: 'gold', category_sports: 'climbing' };

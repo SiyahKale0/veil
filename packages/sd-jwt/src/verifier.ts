@@ -10,7 +10,7 @@ import {
   type PresentationRequest,
   VerificationError,
   type Verifier,
-} from '@veil/core';
+} from 'veil-core';
 import type { Jwk } from './keys.js';
 import { digest, ES256 } from './webcrypto.js';
 

@@ -4,7 +4,7 @@ import type {
   Presentation,
   PresentationRequest,
   Presenter,
-} from '@veil/core';
+} from 'veil-core';
 import {
   challenge,
   ensureReady,

@@ -4,7 +4,7 @@ import {
   MalformedInputError,
   type PresentationRequest,
   VerificationError,
-} from '@veil/core';
+} from 'veil-core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '../src/index.js';
 

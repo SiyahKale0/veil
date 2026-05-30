@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type Credential, MalformedInputError, VerificationError } from '@veil/core';
+import { type Credential, MalformedInputError, VerificationError } from 'veil-core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '../src/index.js';
 

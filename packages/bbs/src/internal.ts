@@ -1,4 +1,4 @@
-import type { CredentialSchema, PresentationRequest } from '@veil/core';
+import type { CredentialSchema, PresentationRequest } from 'veil-core';
 
 /** The crypto-wasm-ts module type. */
 export type Lib = typeof import('@docknetwork/crypto-wasm-ts');

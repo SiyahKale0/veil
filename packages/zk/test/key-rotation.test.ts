@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { keyring, VerificationError } from '@veil/core';
+import { keyring, VerificationError } from 'veil-core';
 import { describe, expect, it } from 'vitest';
 import { type ProofContext, ZkAgeIssuer, ZkAgeProver, ZkAgeVerifier } from '../src/index.js';
 

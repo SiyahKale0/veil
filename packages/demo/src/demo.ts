@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import { InMemoryStore, type PresentationRequest } from '@veil/core';
+import { InMemoryStore, type PresentationRequest } from 'veil-core';
 import {
   generateKeyPair,
   type MembershipClaims,
   SdJwtIssuer,
   SdJwtPresenter,
   SdJwtVerifier,
-} from '@veil/sd-jwt';
+} from 'veil-sd-jwt';
 
 const HIDDEN_CLAIMS = ['user_id', 'email', 'tier'] as const;
 

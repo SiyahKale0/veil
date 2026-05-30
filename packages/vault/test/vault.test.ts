@@ -1,4 +1,4 @@
-import { type Credential, MalformedInputError } from '@veil/core';
+import { type Credential, MalformedInputError } from 'veil-core';
 import { describe, expect, it } from 'vitest';
 import {
   EncryptedVaultStore,

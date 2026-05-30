@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from '@veil/bbs';
-import type { PresentationRequest } from '@veil/core';
+import { BbsIssuer, BbsPresenter, BbsVerifier, type MembershipClaims } from 'veil-bbs';
+import type { PresentationRequest } from 'veil-core';
 
 const CLAIMS: MembershipClaims = {
   user_id: 'u_8f3a21',

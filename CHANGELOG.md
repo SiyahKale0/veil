@@ -2,7 +2,7 @@
 
 ## 0.6.0 — hardening toward production
 
-- Persistence: `@veil/vault` ships a `BlobStore` (`InMemoryBlobStore`,
+- Persistence: `veil-vault` ships a `BlobStore` (`InMemoryBlobStore`,
   `IndexedDbBlobStore`) so a browser wallet can keep the encrypted vault blob
   across reloads. Verified against real IndexedDB in the browser tests.
 - Cross-browser: the browser smoke + persistence tests now run in Chromium,
@@ -69,7 +69,7 @@
 
 Zero-knowledge age predicate.
 
-- `@veil/zk` — `ZkAgeIssuer`, `ZkAgeProver` and `ZkAgeVerifier` prove a statement
+- `veil-zk` — `ZkAgeIssuer`, `ZkAgeProver` and `ZkAgeVerifier` prove a statement
   like "age >= 18" without revealing the age. A composite proof ties a BBS
   signature proof-of-knowledge to a Bulletproofs++ range proof through a
   witness-equality constraint, so the bound is checked against the signed age.
@@ -90,7 +90,7 @@ this Node/CLI build; only Node prove/verify timings are reported here.
 
 BBS selective disclosure with multi-presentation unlinkability.
 
-- `@veil/bbs` — `BbsIssuer`, `BbsPresenter` and `BbsVerifier` on
+- `veil-bbs` — `BbsIssuer`, `BbsPresenter` and `BbsVerifier` on
   `@docknetwork/crypto-wasm-ts` (Rust→WASM, BLS12-381). They implement the same
   `Presenter` / `Verifier` contracts as the SD-JWT scheme.
 - A single credential produces re-randomized proofs, so two presentations cannot
@@ -111,13 +111,13 @@ remains open before any production use.
 
 Cross-app presentation with consent and pairwise identity.
 
-- `@veil/core` — `ConsentManager` and `ConsentDecision` contracts plus
+- `veil-core` — `ConsentManager` and `ConsentDecision` contracts plus
   `ConsentDeniedError`.
-- `@veil/consent` — `Wallet` runs every presentation through a consent step and
+- `veil-consent` — `Wallet` runs every presentation through a consent step and
   discloses only the approved claims, even when the verifier asks for more; it
   keeps an audit log of decisions. Ships `approveAll`, `approveOnly(...)`,
   `denyAll`, and `CallbackConsentManager`.
-- `@veil/sd-jwt` — `PairwiseKeyManager` hands out a distinct holder key per
+- `veil-sd-jwt` — `PairwiseKeyManager` hands out a distinct holder key per
   verifier, so verifiers cannot link the user by the key binding.
 - `npm run demo:consent` walks two apps: the gym gets the one claim it asked
   for; the insurer asks for two but the user approves one; a declined request
@@ -130,7 +130,7 @@ Cross-app presentation with consent and pairwise identity.
 
 Encrypted vault and zero-knowledge sync.
 
-- `@veil/vault` — `EncryptedVaultStore`, a `CredentialStore` that keeps every
+- `veil-vault` — `EncryptedVaultStore`, a `CredentialStore` that keeps every
   credential encrypted at rest. Envelope encryption: a per-credential random DEK
   wrapped by a KEK derived from the password with Argon2id; data sealed with
   XChaCha20-Poly1305 (libsodium).
@@ -148,9 +148,9 @@ Encrypted vault and zero-knowledge sync.
 
 First milestone: SD-JWT-VC selective disclosure.
 
-- `@veil/core` — `Presenter`, `Verifier` and `CredentialStore` contracts plus an
+- `veil-core` — `Presenter`, `Verifier` and `CredentialStore` contracts plus an
   in-memory store.
-- `@veil/sd-jwt` — issuer, presenter and verifier built on SD-JWT-VC (RFC 9901)
+- `veil-sd-jwt` — issuer, presenter and verifier built on SD-JWT-VC (RFC 9901)
   with ES256 signatures and holder key binding.
 - A membership credential issues four selectively disclosable claims; the holder
   reveals only `category_sports`, and `user_id` / `email` / `tier` stay hidden.
