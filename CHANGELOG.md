@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1
+
+- Each published package now ships its own README and a copy of the LICENSE, so
+  the npm page documents the package and its terms.
+- Packages publish under the unscoped `veil-` prefix (`veil-core`, `veil-sd-jwt`,
+  `veil-vault`, `veil-consent`, `veil-bbs`, `veil-zk`) since the `@veil` org was
+  unavailable. The project is still Veil.
+
 ## 0.6.0 — hardening toward production
 
 - Persistence: `veil-vault` ships a `BlobStore` (`InMemoryBlobStore`,

@@ -1,6 +1,6 @@
 {
   "name": "veil",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "description": "Prove something true about you without revealing who you are.",
   "type": "module",

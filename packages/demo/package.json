@@ -1,14 +1,14 @@
 {
   "name": "veil-demo",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "veil-bbs": "0.6.0",
-    "veil-consent": "0.6.0",
-    "veil-core": "0.6.0",
-    "veil-sd-jwt": "0.6.0",
-    "veil-vault": "0.6.0",
-    "veil-zk": "0.6.0"
+    "veil-bbs": "0.6.1",
+    "veil-consent": "0.6.1",
+    "veil-core": "0.6.1",
+    "veil-sd-jwt": "0.6.1",
+    "veil-vault": "0.6.1",
+    "veil-zk": "0.6.1"
   }
 }

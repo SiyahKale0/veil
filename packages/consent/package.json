@@ -1,6 +1,6 @@
 {
   "name": "veil-consent",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "license": "Apache-2.0",
   "repository": {
@@ -27,9 +27,9 @@
     "access": "public"
   },
   "dependencies": {
-    "veil-core": "0.6.0"
+    "veil-core": "0.6.1"
   },
   "devDependencies": {
-    "veil-sd-jwt": "0.6.0"
+    "veil-sd-jwt": "0.6.1"
   }
 }
