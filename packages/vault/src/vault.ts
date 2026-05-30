@@ -8,7 +8,15 @@ import {
   parseJsonObject,
   VeilError,
 } from '@veil/core';
-import { deriveKek, type KdfParams, open, randomKey, type SealedBytes, seal } from './crypto.js';
+import {
+  deriveKek,
+  type KdfOptions,
+  type KdfParams,
+  open,
+  randomKey,
+  type SealedBytes,
+  seal,
+} from './crypto.js';
 
 const VAULT_VERSION = 1;
 const CHECK_TOKEN = 'veil-vault-check';
@@ -115,9 +123,13 @@ export class EncryptedVaultStore implements CredentialStore {
     private readonly entries: Map<string, VaultEntry>,
   ) {}
 
-  /** Creates a fresh, empty vault locked by `password`. */
-  static async create(password: string): Promise<EncryptedVaultStore> {
-    const { kek, params } = await deriveKek(password);
+  /**
+   * Creates a fresh, empty vault locked by `password`. `tuning` overrides the
+   * Argon2id work factors (defaults follow the OWASP baseline); raise them for
+   * higher-value deployments after benchmarking on the target device.
+   */
+  static async create(password: string, tuning?: KdfOptions): Promise<EncryptedVaultStore> {
+    const { kek, params } = await deriveKek(password, undefined, tuning);
     return new EncryptedVaultStore(kek, params, new Map());
   }
 

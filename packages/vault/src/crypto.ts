@@ -58,19 +58,27 @@ const IV_BYTES = 12;
 // target device before production.
 const DEFAULT_PARAMS = { iterations: 2, memoryKiB: 19_456, parallelism: 1 };
 
+/** Argon2id tuning overrides for a fresh derivation. */
+export interface KdfOptions {
+  iterations?: number;
+  memoryKiB?: number;
+  parallelism?: number;
+}
+
 /**
  * Derives a 32-byte key encryption key (KEK) from a password with Argon2id.
- * Pass `existing` params to reproduce a previously derived key (e.g. on unlock);
- * omit them to start fresh with a new random salt.
+ * Pass `existing` params to reproduce a previously derived key (e.g. on unlock).
+ * For a fresh derivation, omit `existing`; `tuning` then overrides the defaults.
  */
 export async function deriveKek(
   password: string,
   existing?: KdfParams,
+  tuning?: KdfOptions,
 ): Promise<{ kek: Uint8Array; params: KdfParams }> {
   const salt = existing ? fromBase64Url(existing.salt) : randomBytes(SALT_BYTES);
-  const iterations = existing?.iterations ?? DEFAULT_PARAMS.iterations;
-  const memoryKiB = existing?.memoryKiB ?? DEFAULT_PARAMS.memoryKiB;
-  const parallelism = existing?.parallelism ?? DEFAULT_PARAMS.parallelism;
+  const iterations = existing?.iterations ?? tuning?.iterations ?? DEFAULT_PARAMS.iterations;
+  const memoryKiB = existing?.memoryKiB ?? tuning?.memoryKiB ?? DEFAULT_PARAMS.memoryKiB;
+  const parallelism = existing?.parallelism ?? tuning?.parallelism ?? DEFAULT_PARAMS.parallelism;
   const kek = await argon2id({
     password,
     salt,

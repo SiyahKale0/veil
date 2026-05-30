@@ -22,14 +22,22 @@ export const fromB64 = (text: string): Uint8Array => {
   return out;
 };
 
-/** Message layout. The age sits at AGE_INDEX and is signed as a positive integer. */
-export const FIELDS = ['user_id', 'age'] as const;
+/**
+ * Message layout: user id, then the age (signed as a positive integer so it can
+ * be range-proven), then the expiry (also a positive integer, revealed in the
+ * proof so the verifier can enforce it).
+ */
+export const FIELDS = ['user_id', 'age', 'exp'] as const;
 export const AGE_INDEX = 1;
+export const EXP_INDEX = 2;
 
 /** Upper bound of the range we prove the age falls in. Comfortably above any real age. */
 export const MAX_AGE = 150;
 
-const PARAMS_LABEL = utf8('veil-zk-age-params-v1');
+/** Default credential lifetime: one year. */
+export const DEFAULT_VALIDITY_SECONDS = 365 * 24 * 60 * 60;
+
+const PARAMS_LABEL = utf8('veil-zk-age-params-v2');
 const BPP_LABEL = utf8('veil-zk-age-bpp-v1');
 
 let libRef: Lib | null = null;
@@ -95,10 +103,16 @@ export function getBppParams(): InstanceType<Lib['BoundCheckBppParams']> {
  * Encodes the credential messages to field elements. The user id is hashed; the
  * age is encoded as a positive integer so a range proof can be made over it.
  */
-export function encodeMessages(userId: string, age: number): Uint8Array[] {
+export function encodeMessages(userId: string, age: number, exp: number): Uint8Array[] {
   const lib = getLib();
   return [
     lib.BBSSignature.encodeMessageForSigning(utf8(userId)),
     lib.BBSSignature.encodePositiveNumberForSigning(age),
+    lib.BBSSignature.encodePositiveNumberForSigning(exp),
   ];
+}
+
+/** Encodes a number as the same field element used for the expiry message. */
+export function encodeNumber(value: number): Uint8Array {
+  return getLib().BBSSignature.encodePositiveNumberForSigning(value);
 }

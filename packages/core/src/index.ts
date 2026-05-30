@@ -73,6 +73,7 @@ export interface CredentialStore {
 }
 
 export { ConsentDeniedError, MalformedInputError, VeilError, VerificationError } from './errors.js';
+export { type KeyResolver, keyring } from './keyring.js';
 export { InMemoryStore } from './memory-store.js';
 export { InMemoryNonceStore, type NonceStore } from './nonce-store.js';
 export {

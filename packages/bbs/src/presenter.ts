@@ -5,13 +5,24 @@ import type {
   PresentationRequest,
   Presenter,
 } from '@veil/core';
-import { challenge, ensureReady, fromB64, getLib, getParams, toB64, utf8 } from './internal.js';
+import {
+  challenge,
+  ensureReady,
+  expIndex,
+  fromB64,
+  getLib,
+  getParams,
+  toB64,
+  utf8,
+} from './internal.js';
 import { membershipSchema } from './membership.js';
 
 interface BbsCredential {
   fields: string[];
   values: string[];
+  exp: number;
   signature: string;
+  kid?: string;
 }
 
 /**
@@ -26,18 +37,21 @@ export class BbsPresenter implements Presenter {
     await ensureReady();
     const params = getParams(this.schema);
     const parsed = JSON.parse(credential.raw) as BbsCredential;
-    const messages = parsed.values.map(utf8);
+    // Messages are the claim values plus the reserved expiry slot at the end.
+    const messages = [...parsed.values, String(parsed.exp)].map(utf8);
     const lib = getLib();
     const signature = new lib.BBSSignature(fromB64(parsed.signature));
 
     const names = this.schema.map((definition) => definition.name);
-    const revealedIndices = request.requestedClaims.map((name) => {
+    const claimIndices = request.requestedClaims.map((name) => {
       const index = names.indexOf(name);
       if (index < 0) {
         throw new Error(`unknown claim: ${name}`);
       }
       return index;
     });
+    // Always reveal the expiry so the verifier can enforce it.
+    const revealedIndices = [...claimIndices, expIndex(this.schema)];
     const revealedSet = new Set(revealedIndices);
     const revealedMsgs = new Map(revealedIndices.map((index) => [index, messages[index]]));
 
@@ -53,11 +67,16 @@ export class BbsPresenter implements Presenter {
     const proof = protocol.generateProof(challenge(contribution, request));
 
     const revealed: Record<string, string> = {};
-    for (const index of revealedIndices) {
+    for (const index of claimIndices) {
       revealed[names[index]] = parsed.values[index];
     }
 
-    const payload = JSON.stringify({ proof: toB64(proof.bytes), revealed });
+    const payload = JSON.stringify({
+      proof: toB64(proof.bytes),
+      revealed,
+      exp: parsed.exp,
+      kid: parsed.kid,
+    });
     return { format: 'bbs', payload };
   }
 }

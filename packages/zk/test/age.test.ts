@@ -86,6 +86,17 @@ describe('zero-knowledge age predicate', () => {
     );
   });
 
+  it('rejects an expired credential', async () => {
+    const verifier = new ZkAgeVerifier(issuer.publicKey);
+    const ctx = context();
+    const expired = await issuer.issue({ user_id: 'u', age: 25 }, { expiresInSeconds: -10 });
+
+    const presentation = await prover.proveAgeAtLeast(expired, 18, ctx);
+    await expect(verifier.verifyAgeAtLeast(presentation, 18, ctx)).rejects.toThrow(
+      VerificationError,
+    );
+  });
+
   it('rejects a malformed proof payload', async () => {
     const verifier = new ZkAgeVerifier(issuer.publicKey);
 

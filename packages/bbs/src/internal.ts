@@ -66,10 +66,18 @@ export function getLib(): Lib {
   return libRef;
 }
 
+// The signed message list is the schema's claims plus one reserved, always-signed
+// expiry slot at the end (so a holder cannot forge or drop the expiry).
+export const messageCount = (schema: CredentialSchema): number => schema.length + 1;
+export const expIndex = (schema: CredentialSchema): number => schema.length;
+
+/** Default credential lifetime: one year. */
+export const DEFAULT_VALIDITY_SECONDS = 365 * 24 * 60 * 60;
+
 // Nothing-up-my-sleeve label derived from the schema, so the same schema yields
 // the same params for issuer, holder and verifier, and different schemas don't.
 function schemaLabel(schema: CredentialSchema): string {
-  return `veil-bbs/v1/${schema.map((definition) => definition.name).join(',')}`;
+  return `veil-bbs/v2/${schema.map((definition) => definition.name).join(',')}+exp`;
 }
 
 /** Deterministic signature params for a schema. Call after {@link ensureReady}. */
@@ -77,7 +85,7 @@ export function getParams(schema: CredentialSchema): InstanceType<Lib['BBSSignat
   const label = schemaLabel(schema);
   let params = paramsBySchema.get(label);
   if (!params) {
-    params = getLib().BBSSignatureParams.generate(schema.length, utf8(label));
+    params = getLib().BBSSignatureParams.generate(messageCount(schema), utf8(label));
     paramsBySchema.set(label, params);
   }
   return params;

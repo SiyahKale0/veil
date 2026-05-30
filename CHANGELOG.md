@@ -2,6 +2,20 @@
 
 ## Unreleased — hardening toward production
 
+- Crypto depth: the vault's Argon2id work factors are now tunable via
+  `EncryptedVaultStore.create(password, { iterations, memoryKiB, parallelism })`,
+  defaulting to the OWASP baseline. Property-based tests (fast-check) check the
+  crypto invariants: the vault round-trips any credential and never opens with a
+  wrong password; SD-JWT and BBS disclose exactly the requested claims and leak
+  nothing else; nonces are single-use.
+- Key rotation: issuers can tag credentials with a `kid`, and every verifier
+  accepts either a fixed key or a `KeyResolver` (`keyring({...})`) that resolves
+  the issuer key by `kid` — so an issuer can rotate keys while old and new
+  credentials still verify. An unknown `kid` is rejected.
+- Credential expiry everywhere: BBS and ZK credentials now carry a signed expiry
+  (a reserved, always-checked slot for BBS; a revealed message for ZK), enforced
+  at verification just like SD-JWT. `issue(..., { expiresInSeconds })` sets it.
+
 - Tooling: Biome lint and format, a GitHub Actions CI workflow, exact-pinned
   dependencies, per-package builds with declarations, and zero audit advisories.
 - Trust boundaries: a typed error hierarchy with generic messages, and

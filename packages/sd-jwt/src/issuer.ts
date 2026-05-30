@@ -27,6 +27,8 @@ export interface SdJwtIssuerOptions {
   schema?: CredentialSchema;
   /** The credential type (`vct`). Defaults to the membership vct. */
   vct?: string;
+  /** Key id placed in the JWT header, so verifiers can rotate issuer keys. */
+  kid?: string;
 }
 
 /** Signs credentials bound to a holder's key. Schema-driven; membership by default. */
@@ -34,6 +36,7 @@ export class SdJwtIssuer {
   private readonly sdjwt: Promise<SDJwtVcInstance>;
   private readonly schema: CredentialSchema;
   private readonly vct: string;
+  private readonly kid?: string;
 
   constructor(
     private readonly issuerId: string,
@@ -42,6 +45,7 @@ export class SdJwtIssuer {
   ) {
     this.schema = options.schema ?? membershipSchema;
     this.vct = options.vct ?? MEMBERSHIP_VCT;
+    this.kid = options.kid;
     this.sdjwt = (async () => {
       const signer = await ES256.getSigner(issuerPrivateKey);
       return new SDJwtVcInstance({
@@ -82,6 +86,7 @@ export class SdJwtIssuer {
     const raw = await sdjwt.issue(
       payload,
       disclosureFrame as unknown as DisclosureFrame<SdJwtVcPayload>,
+      this.kid ? { header: { kid: this.kid } } : undefined,
     );
     return { raw, type: this.vct };
   }

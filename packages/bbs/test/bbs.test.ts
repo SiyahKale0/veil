@@ -142,6 +142,17 @@ describe('BBS selective disclosure', () => {
     );
   });
 
+  it('rejects an expired credential', async () => {
+    const presenter = new BbsPresenter();
+    const verifier = new BbsVerifier(issuer.publicKey);
+
+    const credential = await issuer.issue(CLAIMS, { expiresInSeconds: -10 });
+    const req = request();
+    const presentation = await presenter.present(req, credential);
+
+    await expect(verifier.verify(presentation, req)).rejects.toThrow(VerificationError);
+  });
+
   it('rejects a malformed presentation payload before touching crypto', async () => {
     const verifier = new BbsVerifier(issuer.publicKey);
     const req = request();
